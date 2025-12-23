@@ -3,6 +3,7 @@ package com.project.byeoryback.domain.auth.controller;
 import com.project.byeoryback.domain.auth.dto.JwtResponse;
 import com.project.byeoryback.domain.auth.dto.LoginRequest;
 import com.project.byeoryback.domain.auth.dto.SignupRequest;
+import com.project.byeoryback.domain.auth.dto.SocialLoginRequest;
 import com.project.byeoryback.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/social-login")
+    public ResponseEntity<JwtResponse> socialLogin(@RequestBody SocialLoginRequest request) {
+        return ResponseEntity.ok(authService.socialLogin(request));
     }
 }

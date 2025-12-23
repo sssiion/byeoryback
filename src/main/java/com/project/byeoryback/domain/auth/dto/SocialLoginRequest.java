@@ -10,9 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignupRequest {
+public class SocialLoginRequest {
     private String email;
-    private String password;
     private AuthProvider provider;
     private String providerId;
 }
