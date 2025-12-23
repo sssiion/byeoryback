@@ -64,4 +64,12 @@ public class Post {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    public void update(String title, List<Block> blocks, List<FloatingItem> stickers,
+                       List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages) {
+        this.title = title;
+        this.blocks = blocks;
+        this.stickers = stickers;
+        this.floatingTexts = floatingTexts;
+        this.floatingImages = floatingImages;
+    }
 }
