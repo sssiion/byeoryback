@@ -50,6 +50,9 @@ dependencies {
 
     // 6. env 파일
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    // 7. docker
+    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
 }
 
 tasks.named('test') {
