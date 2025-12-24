@@ -6,6 +6,7 @@ import com.project.byeoryback.domain.auth.dto.JwtResponse;
 import com.project.byeoryback.domain.auth.dto.LoginRequest;
 import com.project.byeoryback.domain.auth.dto.SignupRequest;
 import com.project.byeoryback.domain.auth.dto.SocialLoginRequest;
+import com.project.byeoryback.domain.auth.exception.EmailAlreadyExistsException;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import com.project.byeoryback.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AuthService {
     @Transactional
     public void signup(SignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException("이미 존재하는 계정입니다.");
         }
 
         AuthProvider provider = request.getProvider() != null ? request.getProvider() : AuthProvider.LOCAL;
