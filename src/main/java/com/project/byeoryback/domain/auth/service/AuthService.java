@@ -67,15 +67,24 @@ public class AuthService {
 
     public JwtResponse socialLogin(SocialLoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElse(null);
 
-        if (user.getProvider() != request.getProvider()) {
-            throw new RuntimeException("Auth provider does not match");
-        }
-
-        // Optionally verify providerId matches
-        if (request.getProviderId() != null && !request.getProviderId().equals(user.getProviderId())) {
-            throw new RuntimeException("Invalid Provider ID");
+        if (user == null) {
+            // Create new user if not exists
+            user = User.builder()
+                    .email(request.getEmail())
+                    .role("ROLE_USER")
+                    .provider(request.getProvider())
+                    .providerId(request.getProviderId())
+                    .fullProfile(false)
+                    .build();
+            userRepository.save(user);
+        } else {
+            // Existing user verification
+            if (user.getProvider() != request.getProvider()) {
+                throw new RuntimeException("Auth provider does not match");
+            }
+            // Optional: Update providerId if needed
         }
 
         String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile());
