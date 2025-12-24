@@ -2,6 +2,7 @@ package com.project.byeoryback.domain.post.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -15,6 +16,8 @@ public class FloatingItem {
     private double w;
     private double h;
     private double rotation;
+
+    @JsonProperty("zIndex")
     private int zIndex;
     private double opacity;
     private String url; // 이미지 URL
