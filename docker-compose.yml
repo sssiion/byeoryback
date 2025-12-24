@@ -1,14 +1,13 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:15-alpine
+  mysql:
+    image: mysql:8.0
     container_name: byeoryback
     ports:
-      - "5432:5432"
+      - "3307:3306"
     environment:
-      POSTGRES_DB: byeoryback
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: byeoryback
+      MYSQL_DATABASE: byeoryback
+      MYSQL_ROOT_PASSWORD: byeoryback
     restart: always
     volumes:
-      - ./db_data:/var/lib/postgresql/data
+      - ./mysql_data:/var/lib/mysql

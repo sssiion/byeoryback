@@ -29,23 +29,23 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 1. 블록 리스트 (JSONB 저장)
-    @Column(columnDefinition = "jsonb")
+    // 1. 블록 리스트 (JSON 저장)
+    @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON) // Hibernate 6버전 이상에서 JSON 처리 시 권장
     private List<Block> blocks;
 
     // 2. 스티커 리스트
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<FloatingItem> stickers;
 
     // 3. 텍스트 메모 리스트
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<FloatingItem> floatingTexts;
 
     // 4. 자유 이미지 리스트 (URL 포함)
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<FloatingItem> floatingImages;
 
@@ -64,8 +64,9 @@ public class Post {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
     public void update(String title, List<Block> blocks, List<FloatingItem> stickers,
-                       List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages) {
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages) {
         this.title = title;
         this.blocks = blocks;
         this.stickers = stickers;
