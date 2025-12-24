@@ -1,9 +1,9 @@
-package com.project.byeoryback.domain.auth.service;
+package com.project.byeoryback.domain.post.service;
 
 
-import com.project.byeoryback.domain.auth.dto.PostRequest;
-import com.project.byeoryback.domain.user.entity.Post.*;
-import com.project.byeoryback.domain.user.repository.PostRepository;
+import com.project.byeoryback.domain.post.dto.PostRequest;
+import com.project.byeoryback.domain.post.entity.Post;
+import com.project.byeoryback.domain.post.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

@@ -1,4 +1,4 @@
-package com.project.byeoryback.domain.user.entity.Post;
+package com.project.byeoryback.domain.post.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.project.byeoryback.domain.user.entity.Post;
+package com.project.byeoryback.domain.post.entity;
 
 import com.project.byeoryback.domain.user.entity.User;
 import jakarta.persistence.*;

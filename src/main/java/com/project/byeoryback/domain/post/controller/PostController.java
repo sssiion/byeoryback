@@ -1,8 +1,8 @@
-package com.project.byeoryback.domain.auth.controller;
+package com.project.byeoryback.domain.post.controller;
 
-import com.project.byeoryback.domain.auth.dto.PostRequest;
-import com.project.byeoryback.domain.auth.service.PostService;
-import com.project.byeoryback.domain.user.entity.Post.Post;
+import com.project.byeoryback.domain.post.dto.PostRequest;
+import com.project.byeoryback.domain.post.service.PostService;
+import com.project.byeoryback.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

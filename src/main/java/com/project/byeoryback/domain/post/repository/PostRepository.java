@@ -1,6 +1,6 @@
-package com.project.byeoryback.domain.user.repository;
+package com.project.byeoryback.domain.post.repository;
 
-import com.project.byeoryback.domain.user.entity.Post.Post;
+import com.project.byeoryback.domain.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

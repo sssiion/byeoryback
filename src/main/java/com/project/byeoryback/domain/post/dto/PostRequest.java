@@ -1,7 +1,8 @@
-package com.project.byeoryback.domain.auth.dto;
+package com.project.byeoryback.domain.post.dto;
 
 
-import com.project.byeoryback.domain.user.entity.Post.*;
+import com.project.byeoryback.domain.post.entity.Block;
+import com.project.byeoryback.domain.post.entity.FloatingItem;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
