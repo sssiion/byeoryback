@@ -38,6 +38,9 @@
 }
 ```
 
+전체 설정 조회
+### GET /api/setting/all
+
 테마 수정(설정)
 ### PUT /api/setting/theme
 (JWT 토큰 받아야 함)
@@ -86,3 +89,28 @@
 테마 값 불러오기
 ### GET /api/setting/theme
 
+메뉴 순서 변경
+### PUT /api/setting/menu
+```json
+{
+  "menuOrder": [
+    "/community",
+    "/market",
+    "/home",
+    "/post"
+  ]
+}
+```
+
+메뉴 순서 조회 확인
+### GET /api/setting/menu
+```json 예상 응답
+{
+  "menuOrder": [
+    "/community",
+    "/market",
+    "/home",
+    "/post"
+  ]
+}
+```
