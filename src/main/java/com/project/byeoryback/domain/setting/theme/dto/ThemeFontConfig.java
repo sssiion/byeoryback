@@ -1,8 +1,9 @@
 package com.project.byeoryback.domain.setting.theme.dto;
 
-public record ThemeFontConfig() {
+public record ThemeFontConfig(
 
-    // 폰트 설정
+        // 폰트 설정
 
-
-}
+        String family,
+        String size
+) {}

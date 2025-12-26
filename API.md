@@ -1,3 +1,4 @@
+로컬 회원가입
 ### POST /auth/join
 **Local Join**
 ```json
@@ -8,6 +9,7 @@
 } 
 ```
 
+소셜 회원가입
 **Social Join (Google)**
 ```json
 {
@@ -17,6 +19,7 @@
 }
 ```
 
+로그인
 ### POST /auth/login
 ```json
 {
@@ -25,6 +28,7 @@
 }
 ```
 
+소셜 로그인
 ### POST /auth/social-login
 ```json
 {
@@ -33,3 +37,52 @@
   "providerId": "google_unique_id_123"
 }
 ```
+
+테마 수정(설정)
+### PUT /api/setting/theme
+(JWT 토큰 받아야 함)
+```json
+{
+  "mode": "dark",
+  "font": {
+    "family": "'Noto Sans KR', sans-serif",
+    "size": "16px"
+  }
+}
+```
+
+(테마 수동 설정)
+```json
+{
+  "mode": "manual",
+  "font": {
+    "family": "Pretendard",
+    "size": "14px"
+  },
+  "manualConfig": {
+    "text": {
+      "color": "#333333",
+      "intensity": 100
+    },
+    "background": {
+      "isGradient": true,
+      "color": "#ffffff",
+      "intensity": 100,
+      "gradientDirection": "to bottom right",
+      "gradientStart": "#ff9a9e",
+      "gradientEnd": "#fecfef",
+      "image": "",
+      "size": "cover"
+    },
+    "component": {
+      "cardColor": "rgba(255, 255, 255, 0.8)",
+      "btnColor": "#6200ea",
+      "btnTextColor": "#ffffff"
+    }
+  }
+}
+```
+
+테마 값 불러오기
+### GET /api/setting/theme
+
