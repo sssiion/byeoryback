@@ -1,4 +1,9 @@
 package com.project.byeoryback.domain.setting.page.repository;
 
-public class PageSettingRepository {
+import com.project.byeoryback.domain.setting.page.entity.PageSetting;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface PageSettingRepository extends JpaRepository<PageSetting, Long> {
+    Optional<PageSetting> findByUserId(Long userId);
 }
