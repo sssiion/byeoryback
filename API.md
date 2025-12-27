@@ -9,108 +9,33 @@
 } 
 ```
 
-소셜 회원가입
-**Social Join (Google)**
+---
+
+이메일 인증 번호 발송
+### POST /auth/email/send
+**Email Send**
 ```json
 {
-  "email": "user@gmail.com",
-  "provider": "GOOGLE",
-  "providerId": "google_unique_id_123"
+  "email": "your_email@gmail.com"
 }
 ```
+**Response**
+```text
+(6자리 인증번호, 예: 123456)
+```
 
-로그인
-### POST /auth/login
+---
+
+이메일 인증 번호 확인
+### POST /auth/email/check
+**Email Check**
 ```json
 {
-  "email": "user@example.com",
-  "password": "password"
+  "email": "your_email@gmail.com",
+  "authNum": "123456"
 }
 ```
-
-소셜 로그인
-### POST /auth/social-login
-```json
-{
-  "email": "user@gmail.com",
-  "provider": "GOOGLE",
-  "providerId": "google_unique_id_123"
-}
-```
-
-전체 설정 조회
-### GET /api/setting/all
-
-테마 수정(설정)
-### PUT /api/setting/theme
-(JWT 토큰 받아야 함)
-```json
-{
-  "mode": "dark",
-  "font": {
-    "family": "'Noto Sans KR', sans-serif",
-    "size": "16px"
-  }
-}
-```
-
-(테마 수동 설정)
-```json
-{
-  "mode": "manual",
-  "font": {
-    "family": "Pretendard",
-    "size": "14px"
-  },
-  "manualConfig": {
-    "text": {
-      "color": "#333333",
-      "intensity": 100
-    },
-    "background": {
-      "isGradient": true,
-      "color": "#ffffff",
-      "intensity": 100,
-      "gradientDirection": "to bottom right",
-      "gradientStart": "#ff9a9e",
-      "gradientEnd": "#fecfef",
-      "image": "",
-      "size": "cover"
-    },
-    "component": {
-      "cardColor": "rgba(255, 255, 255, 0.8)",
-      "btnColor": "#6200ea",
-      "btnTextColor": "#ffffff"
-    }
-  }
-}
-```
-
-테마 값 불러오기
-### GET /api/setting/theme
-
-메뉴 순서 변경
-### PUT /api/setting/menu
-```json
-{
-  "menuOrder": [
-    "/community",
-    "/market",
-    "/home",
-    "/post"
-  ]
-}
-```
-
-메뉴 순서 조회 확인
-### GET /api/setting/menu
-```json 예상 응답
-{
-  "menuOrder": [
-    "/community",
-    "/market",
-    "/home",
-    "/post"
-  ]
-}
+**Response**
+```text
+true / false
 ```

@@ -53,6 +53,9 @@ dependencies {
 
     // 7. docker
     runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // 8. Google SMTP
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
