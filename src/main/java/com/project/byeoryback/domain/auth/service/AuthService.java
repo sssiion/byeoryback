@@ -7,6 +7,8 @@ import com.project.byeoryback.domain.auth.dto.LoginRequest;
 import com.project.byeoryback.domain.auth.dto.SignupRequest;
 import com.project.byeoryback.domain.auth.dto.SocialLoginRequest;
 import com.project.byeoryback.domain.auth.exception.EmailAlreadyExistsException;
+import com.project.byeoryback.domain.auth.exception.InvalidPasswordException;
+import com.project.byeoryback.domain.user.exception.UserNotFoundException;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import com.project.byeoryback.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +55,15 @@ public class AuthService {
     }
 
     public JwtResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Incorrect password");
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile(), user.getProvider().name());
 

@@ -7,6 +7,7 @@ import com.project.byeoryback.domain.user.entity.UserProfile;
 import com.project.byeoryback.domain.user.repository.UserProfileRepository;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import com.project.byeoryback.domain.user.exception.UserProfileNotFoundException;
+import com.project.byeoryback.domain.user.exception.NicknameAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,11 @@ public class UserService {
                 UserProfile profile = userProfileRepository.findByUserId(userId)
                                 .orElseThrow(() -> new UserProfileNotFoundException(userId));
 
+                if (!profile.getNickname().equals(request.nickname())
+                                && userProfileRepository.existsByNickname(request.nickname())) {
+                        throw new NicknameAlreadyExistsException("Nickname already exists: " + request.nickname());
+                }
+
                 profile.update(
                                 request.profilePhoto(),
                                 request.name(),
@@ -56,6 +62,10 @@ public class UserService {
 
                 if (user.isFullProfile()) {
                         throw new IllegalStateException("User profile is already completed");
+                }
+
+                if (userProfileRepository.existsByNickname(request.nickname())) {
+                        throw new NicknameAlreadyExistsException("Nickname already exists: " + request.nickname());
                 }
 
                 UserProfile userProfile = UserProfile.builder()
