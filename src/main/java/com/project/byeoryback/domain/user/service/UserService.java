@@ -6,6 +6,7 @@ import com.project.byeoryback.domain.user.entity.User;
 import com.project.byeoryback.domain.user.entity.UserProfile;
 import com.project.byeoryback.domain.user.repository.UserProfileRepository;
 import com.project.byeoryback.domain.user.repository.UserRepository;
+import com.project.byeoryback.domain.user.exception.UserProfileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,64 +15,65 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
+        private final UserRepository userRepository;
+        private final UserProfileRepository userProfileRepository;
 
-    @Transactional(readOnly = true)
-    public UserProfileResponse getUserProfile(Long userId) {
-        UserProfile profile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found for user id: " + userId));
+        @Transactional(readOnly = true)
+        public UserProfileResponse getUserProfile(Long userId) {
+                UserProfile profile = userProfileRepository.findByUserId(userId)
+                                .orElseThrow(() -> new UserProfileNotFoundException(userId));
 
-        return new UserProfileResponse(
-                profile.getProfilePhoto(),
-                profile.getName(),
-                profile.getNickname(),
-                profile.getBirthDate(),
-                profile.getPhone(),
-                profile.getGender(),
-                profile.getBio());
-    }
-
-    @Transactional
-    public void updateUserProfile(Long userId, UserProfileRequest request) {
-        UserProfile profile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found for user id: " + userId));
-
-        profile.update(
-                request.profilePhoto(),
-                request.name(),
-                request.nickname(),
-                request.birthDate(),
-                request.phone(),
-                request.gender(),
-                request.bio());
-    }
-
-    @Transactional
-    public void completeUserProfile(Long userId, UserProfileRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        if (user.isFullProfile()) {
-            throw new IllegalStateException("User profile is already completed");
+                return new UserProfileResponse(
+                                profile.getProfilePhoto(),
+                                profile.getName(),
+                                profile.getNickname(),
+                                profile.getUser().getEmail(),
+                                profile.getBirthDate(),
+                                profile.getPhone(),
+                                profile.getGender(),
+                                profile.getBio());
         }
 
-        UserProfile userProfile = UserProfile.builder()
-                .user(user)
-                .profilePhoto(request.profilePhoto())
-                .name(request.name())
-                .nickname(request.nickname())
-                .birthDate(request.birthDate())
-                .phone(request.phone())
-                .gender(request.gender())
-                .bio(request.bio())
-                .build();
+        @Transactional
+        public void updateUserProfile(Long userId, UserProfileRequest request) {
+                UserProfile profile = userProfileRepository.findByUserId(userId)
+                                .orElseThrow(() -> new UserProfileNotFoundException(userId));
 
-        userProfileRepository.save(userProfile);
+                profile.update(
+                                request.profilePhoto(),
+                                request.name(),
+                                request.nickname(),
+                                request.birthDate(),
+                                request.phone(),
+                                request.gender(),
+                                request.bio());
+        }
 
-        user.completeProfile();
-        // Transactional will dirty check and save user update, but explicitly saving if
-        // needed
-        // userRepository.save(user);
-    }
+        @Transactional
+        public void completeUserProfile(Long userId, UserProfileRequest request) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+                if (user.isFullProfile()) {
+                        throw new IllegalStateException("User profile is already completed");
+                }
+
+                UserProfile userProfile = UserProfile.builder()
+                                .user(user)
+                                .profilePhoto(request.profilePhoto())
+                                .name(request.name())
+                                .nickname(request.nickname())
+                                .birthDate(request.birthDate())
+                                .phone(request.phone())
+                                .gender(request.gender())
+                                .bio(request.bio())
+                                .build();
+
+                userProfileRepository.save(userProfile);
+
+                user.completeProfile();
+                // Transactional will dirty check and save user update, but explicitly saving if
+                // needed
+                // userRepository.save(user);
+        }
 }

@@ -17,14 +17,19 @@ public class MenuController {
 
     @GetMapping
     public ResponseEntity<MenuDto> getMenu(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(menuService.getMenu(userDetails.getUser().getId()));
     }
 
     @PutMapping
     public ResponseEntity<Void> updateMenu(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody MenuDto menuDto
-    ) {
+            @RequestBody MenuDto menuDto) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         menuService.updateMenu(userDetails.getUser().getId(), menuDto);
         return ResponseEntity.ok().build();
     }

@@ -25,6 +25,7 @@ public class UserProfile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String profilePhoto;
 
     @Column(nullable = false)

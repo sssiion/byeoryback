@@ -13,4 +13,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
+
+    @ExceptionHandler(com.project.byeoryback.domain.user.exception.UserProfileNotFoundException.class)
+    public ResponseEntity<Void> handleUserProfileNotFoundException(
+            com.project.byeoryback.domain.user.exception.UserProfileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 }

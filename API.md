@@ -48,6 +48,7 @@ Status: 200 OK
   "profilePhoto": "https://example.com/profile.jpg",
   "name": "홍길동",
   "nickname": "StarUser",
+  "email": "user@example.com",
   "birthDate": "1995-12-25",
   "phone": "010-1234-5678",
   "gender": "MALE",
