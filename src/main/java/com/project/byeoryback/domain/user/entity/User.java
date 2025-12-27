@@ -36,4 +36,8 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private boolean fullProfile = false;
+
+    public void completeProfile() {
+        this.fullProfile = true;
+    }
 }
