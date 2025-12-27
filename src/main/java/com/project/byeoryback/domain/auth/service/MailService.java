@@ -43,11 +43,14 @@ public class MailService {
 
         helper.setFrom(senderEmail);
         helper.setTo(mail);
-        helper.setSubject("[Byeoryback] 이메일 인증 번호");
+        helper.setSubject("[벼리] 이메일 인증 번호 안내");
         String body = "";
-        body += "<h3>" + "요청하신 인증 번호입니다." + "</h3>";
-        body += "<h1>" + number + "</h1>";
-        body += "<h3>" + "감사합니다." + "</h3>";
+        body += "<h3 style='color: #333333; font-size: 16px; font-weight: normal;'>요청하신 인증 번호입니다.</h3>";
+        body += "<div style='background-color: #f9f9f9; padding: 30px; margin: 20px 0; text-align: center; border-radius: 10px;'>";
+        body += "<span style='font-size: 32px; font-weight: bold; color: #4A90E2; letter-spacing: 5px;'>" + number + "</span>";
+        body += "</div>";
+        body += "<p style='font-size: 14px; color: #666666;'>인증 번호를 입력창에 정확히 입력해 주세요. 감사합니다.</p>";
+        body += "</div>";
         helper.setText(body, true);
 
         return message;
