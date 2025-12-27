@@ -51,4 +51,13 @@ public class AuthController {
     public ResponseEntity<JwtResponse> socialLogin(@RequestBody SocialLoginRequest request) {
         return ResponseEntity.ok(authService.socialLogin(request));
     }
+
+    @org.springframework.web.bind.annotation.PutMapping("/password")
+    public ResponseEntity<String> changePassword(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
+            @RequestBody com.project.byeoryback.domain.auth.dto.PasswordChangeRequest request) {
+        authService.changePassword(userDetails.getUser().getId(), request.getCurrentPassword(),
+                request.getNewPassword());
+        return ResponseEntity.ok("Password updated successfully");
+    }
 }

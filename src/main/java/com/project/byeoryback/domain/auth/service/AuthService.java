@@ -59,7 +59,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile());
+        String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile(), user.getProvider().name());
 
         return JwtResponse.builder()
                 .accessToken(jwt)
@@ -88,10 +88,27 @@ public class AuthService {
             // Optional: Update providerId if needed
         }
 
-        String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile());
+        String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile(), user.getProvider().name());
 
         return JwtResponse.builder()
                 .accessToken(jwt)
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getProvider() != AuthProvider.LOCAL) {
+            throw new IllegalArgumentException("Only local users can change password");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect current password");
+        }
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        // userRepository.save(user); // Transactional will handle save
     }
 }

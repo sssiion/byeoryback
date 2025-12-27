@@ -40,4 +40,8 @@ public class User {
     public void completeProfile() {
         this.fullProfile = true;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
