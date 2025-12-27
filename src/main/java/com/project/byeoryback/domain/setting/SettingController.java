@@ -26,19 +26,13 @@ public class SettingController {
 
     @GetMapping("/all")
     public ResponseEntity<AllSettingsResponse> getAllSettings(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getId();
 
         return ResponseEntity.ok(new AllSettingsResponse(
-
                 themeService.getTheme(userId),
-                menuService.getMenu(userId).menuOrder(),
-                pageService.getPage(userId),
-
-                // 3. Widget (아직 없음 -> 빈 리스트 반환)
-                // widgetService.getWidgets(userId),
-                Collections.emptyList()
-        ));
+                menuService.getMenu(userId),
+                Collections.emptyList(), // widget (아직 구현 안됨)
+                pageService.getPage(userId)));
     }
 }
