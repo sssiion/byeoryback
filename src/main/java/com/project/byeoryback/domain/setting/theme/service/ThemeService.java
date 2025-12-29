@@ -43,11 +43,8 @@ public class ThemeService {
         String jsonConfig = convertDtoToJson(themeDto);
 
         // 3. 저장 또는 업데이트
-        ThemeSetting setting = themeRepository.findByUserId(userId)
-                .orElseGet(() -> ThemeSetting.builder().userId(userId).build());
-
-        setting.updateConfig(jsonConfig);
-        themeRepository.save(setting);
+        // 3. 저장 또는 업데이트 (Concurrency issue fix with native upsert)
+        themeRepository.upsertTheme(userId, jsonConfig);
     }
 
     // --- Helper Methods ---
@@ -57,8 +54,7 @@ public class ThemeService {
         return new ThemeDto(
                 ThemeMode.DEFAULT,
                 new ThemeFontConfig("'Noto Sans KR', sans-serif", "16px"),
-                null
-        );
+                null);
     }
 
     private ThemeDto convertJsonToDto(String json) {

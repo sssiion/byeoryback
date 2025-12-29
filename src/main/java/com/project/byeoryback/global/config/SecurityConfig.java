@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http)) // Use WebConfig configuration
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/join", "/auth/login", "/auth/social-login", "/auth/email/**")
+                        .requestMatchers("/auth/**", "/api/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
