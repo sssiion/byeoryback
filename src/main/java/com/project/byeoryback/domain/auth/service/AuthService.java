@@ -8,6 +8,11 @@ import com.project.byeoryback.domain.auth.dto.SignupRequest;
 import com.project.byeoryback.domain.auth.dto.SocialLoginRequest;
 import com.project.byeoryback.domain.auth.exception.EmailAlreadyExistsException;
 import com.project.byeoryback.domain.auth.exception.InvalidPasswordException;
+import com.project.byeoryback.domain.auth.exception.SocialAccountException;
+import com.project.byeoryback.domain.auth.dto.PasswordResetRequestDto;
+import com.project.byeoryback.domain.auth.dto.PasswordResetVerifyRequestDto;
+import com.project.byeoryback.domain.auth.dto.PasswordResetVerifyResponseDto;
+import com.project.byeoryback.domain.auth.dto.PasswordResetConfirmRequestDto;
 import com.project.byeoryback.domain.user.exception.UserNotFoundException;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import com.project.byeoryback.global.security.JwtUtil;
@@ -26,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final MailService mailService;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -116,5 +122,45 @@ public class AuthService {
 
         user.updatePassword(passwordEncoder.encode(newPassword));
         // userRepository.save(user); // Transactional will handle save
+    }
+
+    public void requestPasswordReset(PasswordResetRequestDto request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        if (user.getProvider() == AuthProvider.GOOGLE) {
+            throw new SocialAccountException("Social account cannot reset password");
+        }
+
+        try {
+            mailService.sendSimpleMessage(request.getEmail());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email verification code", e);
+        }
+    }
+
+    public PasswordResetVerifyResponseDto verifyPasswordReset(PasswordResetVerifyRequestDto request) {
+        boolean verified = mailService.verifyEmailCode(request.getEmail(), request.getCode());
+        if (!verified) {
+            throw new IllegalArgumentException("Invalid verification code");
+        }
+        return new PasswordResetVerifyResponseDto(jwtUtil.generateResetToken(request.getEmail()));
+    }
+
+    @Transactional
+    public void confirmPasswordReset(PasswordResetConfirmRequestDto request) {
+        if (!jwtUtil.validateToken(request.getResetToken(), request.getEmail())) {
+            throw new IllegalArgumentException("Invalid or expired reset token");
+        }
+
+        String type = jwtUtil.extractClaim(request.getResetToken(), claims -> claims.get("type", String.class));
+        if (!"RESET".equals(type)) {
+            throw new IllegalArgumentException("Invalid token type");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        user.updatePassword(passwordEncoder.encode(request.getPassword()));
     }
 }

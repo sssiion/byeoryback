@@ -1,7 +1,6 @@
 package com.project.byeoryback.domain.setting.theme.service;
 
 import com.project.byeoryback.domain.setting.theme.dto.*;
-import com.project.byeoryback.domain.setting.theme.entity.ThemeSetting;
 import com.project.byeoryback.domain.setting.theme.repository.ThemeSettingRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

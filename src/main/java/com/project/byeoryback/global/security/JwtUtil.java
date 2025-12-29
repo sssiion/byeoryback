@@ -64,4 +64,14 @@ public class JwtUtil {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
+
+    public String generateResetToken(String email) {
+        return Jwts.builder()
+                .subject(email)
+                .claim("type", "RESET")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 600000)) // 10 minutes
+                .signWith(key)
+                .compact();
+    }
 }
