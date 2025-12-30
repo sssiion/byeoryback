@@ -78,6 +78,7 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
     public JwtResponse socialLogin(SocialLoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElse(null);
@@ -95,7 +96,7 @@ public class AuthService {
         } else {
             // Existing user verification
             if (user.getProvider() != request.getProvider()) {
-                throw new RuntimeException("Auth provider does not match");
+                throw new SocialAccountException("이미 " + user.getProvider() + " 계정으로 가입된 이메일입니다.");
             }
             // Optional: Update providerId if needed
         }
@@ -128,7 +129,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
 
-        if (user.getProvider() == AuthProvider.GOOGLE) {
+        if (user.getProvider() != AuthProvider.LOCAL) {
             throw new SocialAccountException("Social account cannot reset password");
         }
 

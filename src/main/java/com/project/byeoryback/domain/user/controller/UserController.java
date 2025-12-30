@@ -39,4 +39,11 @@ public class UserController {
         userService.completeUserProfile(userId, request);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
+        userService.deleteUser(userId);
+        return ResponseEntity.ok().build();
+    }
 }

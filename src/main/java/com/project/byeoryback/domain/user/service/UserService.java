@@ -7,7 +7,13 @@ import com.project.byeoryback.domain.user.entity.UserProfile;
 import com.project.byeoryback.domain.user.repository.UserProfileRepository;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import com.project.byeoryback.domain.user.exception.UserProfileNotFoundException;
+
 import com.project.byeoryback.domain.user.exception.NicknameAlreadyExistsException;
+import com.project.byeoryback.domain.post.repository.PostRepository;
+import com.project.byeoryback.domain.todo.repository.TodoRepository;
+import com.project.byeoryback.domain.setting.page.repository.PageSettingRepository;
+import com.project.byeoryback.domain.setting.theme.repository.ThemeSettingRepository;
+import com.project.byeoryback.domain.setting.menu.repository.MenuSettingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +24,11 @@ public class UserService {
 
         private final UserRepository userRepository;
         private final UserProfileRepository userProfileRepository;
+        private final PostRepository postRepository;
+        private final TodoRepository todoRepository;
+        private final PageSettingRepository pageSettingRepository;
+        private final ThemeSettingRepository themeSettingRepository;
+        private final MenuSettingRepository menuSettingRepository;
 
         @Transactional(readOnly = true)
         public UserProfileResponse getUserProfile(Long userId) {
@@ -85,5 +96,32 @@ public class UserService {
                 // Transactional will dirty check and save user update, but explicitly saving if
                 // needed
                 // userRepository.save(user);
+        }
+
+        @Transactional
+        public void deleteUser(Long userId) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+                // 1. Delete User Profile
+                // Note: If UserProfile has cascade delete on User, this might be optional,
+                // but checking entity definition usually it's cleaner to delete children first
+                // or rely on constraints.
+                // Assuming explicit deletion for safety/clarity.
+                userProfileRepository.findByUserId(userId).ifPresent(userProfileRepository::delete);
+
+                // 2. Delete Posts
+                postRepository.deleteByUserId(userId);
+
+                // 3. Delete Todos
+                todoRepository.deleteByUser(user);
+
+                // 4. Delete Settings
+                pageSettingRepository.deleteByUserId(userId);
+                themeSettingRepository.deleteByUserId(userId);
+                menuSettingRepository.deleteByUserId(userId);
+
+                // 5. Delete User
+                userRepository.delete(user);
         }
 }
