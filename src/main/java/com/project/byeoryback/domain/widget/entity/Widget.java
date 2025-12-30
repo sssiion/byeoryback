@@ -1,5 +1,6 @@
 package com.project.byeoryback.domain.widget.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.byeoryback.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,7 +38,8 @@ public class Widget {
 
     // 🌟 1. 작성자 연결 (제공해주신 User 엔티티 사용)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "users")
+    @JsonIgnore
     private User user;
 
     // 🌟 2. 공유 여부 (true면 마켓에 공개)
@@ -54,17 +56,23 @@ public class Widget {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // 🌟 [NEW] 위젯 사이즈 추가 (예: "2x2", "4x2")
+    @Column(length = 10)
+    private String defaultSize;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String name, Map<String, Object> content, Map<String, Object> styles, boolean isShared) {
+    public void update(String name,String defaultSize, Map<String, Object> content, Map<String, Object> styles, boolean isShared) {
         this.name = name;
+        this.defaultSize = defaultSize; // 사이즈 업데이트
         this.content = content;
         this.styles = styles;
         this.isShared = isShared;
+        this.updatedAt = LocalDateTime.now(); // 수정 시간 갱신
     }
 
     public void incrementDownloadCount() {

@@ -22,14 +22,15 @@ public class WidgetService {
     @Transactional
     public Widget createWidget(Long userId, WidgetRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Widget widget = Widget.builder()
+                .user(user)
                 .name(request.getName())
                 .type(request.getType())
+                .defaultSize(request.getDefaultSize() != null ? request.getDefaultSize() : "2x2") // 🌟 없으면 2x2 기본값
                 .content(request.getContent())
                 .styles(request.getStyles())
-                .user(user)
                 .isShared(false) // 기본은 비공개
                 .build();
 
@@ -54,17 +55,17 @@ public class WidgetService {
 
     // 5. 위젯 수정 -> Controller의 updateWidget 매칭
     @Transactional
-    public Widget updateWidget(Long id, WidgetRequest request) {
-        Widget widget = widgetRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("위젯이 존재하지 않습니다. id=" + id));
-
+    public Widget updateWidget(Long widgetId, WidgetRequest request) {
+        Widget widget = widgetRepository.findById(widgetId)
+                .orElseThrow(() -> new IllegalArgumentException("Widget not found"));
         // (선택) 여기서 userId 체크 로직을 넣어서 본인 것만 수정하게 막을 수 있음
 
         widget.update(
                 request.getName(),
+                request.getDefaultSize(),
                 request.getContent(),
                 request.getStyles(),
-                widget.isShared() // 공유 상태는 유지 (별도 API로 변경)
+                request.isShared() // DTO에 없다면 false or 기존값 유지
         );
         return widget;
     }
@@ -90,6 +91,7 @@ public class WidgetService {
         // 상태 반전 및 업데이트 (나머지 필드는 그대로 유지)
         widget.update(
                 widget.getName(),
+                widget.getDefaultSize(),
                 widget.getContent(),
                 widget.getStyles(),
                 !widget.isShared() // true <-> false 토글
