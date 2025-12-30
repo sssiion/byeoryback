@@ -12,4 +12,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findAllByUser(User user);
 
     List<Todo> findAllByUserOrderByStartDateDesc(User user);
+
+    void deleteByUser(User user);
 }

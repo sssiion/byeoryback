@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface MenuSettingRepository extends JpaRepository<MenuSetting, Long> {
     Optional<MenuSetting> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }

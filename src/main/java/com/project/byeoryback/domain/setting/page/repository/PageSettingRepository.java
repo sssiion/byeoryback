@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface PageSettingRepository extends JpaRepository<PageSetting, Long> {
     Optional<PageSetting> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }
