@@ -47,7 +47,8 @@ public class MailService {
         String body = "";
         body += "<h3 style='color: #333333; font-size: 16px; font-weight: normal;'>요청하신 인증 번호입니다.</h3>";
         body += "<div style='background-color: #f9f9f9; padding: 30px; margin: 20px 0; text-align: center; border-radius: 10px;'>";
-        body += "<span style='font-size: 32px; font-weight: bold; color: #4A90E2; letter-spacing: 5px;'>" + number + "</span>";
+        body += "<span style='font-size: 32px; font-weight: bold; color: #4A90E2; letter-spacing: 5px;'>" + number
+                + "</span>";
         body += "</div>";
         body += "<p style='font-size: 14px; color: #666666;'>인증 번호를 입력창에 정확히 입력해 주세요. 감사합니다.</p>";
         body += "</div>";
@@ -78,5 +79,15 @@ public class MailService {
             return true;
         }
         return false;
+    }
+
+    public void sendPinCode(String to, String code) {
+        try {
+            MimeMessage message = createMail(to, code);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            log.error("PIN 메일 발송 오류", e);
+            throw new IllegalArgumentException("메일 발송 중 오류가 발생했습니다.");
+        }
     }
 }
