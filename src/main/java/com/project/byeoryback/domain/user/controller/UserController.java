@@ -46,4 +46,17 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/heartbeat")
+    public ResponseEntity<Void> recordHeartbeat(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
+        userService.recordHeartbeat(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/playtime")
+    public ResponseEntity<Long> getPlayTime(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
+        return ResponseEntity.ok(userService.getPlayTime(userId));
+    }
 }

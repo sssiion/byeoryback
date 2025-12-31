@@ -37,11 +37,25 @@ public class User {
     @Builder.Default
     private boolean fullProfile = false;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Long todayPlayTime = 0L; // Seconds
+
+    private java.time.LocalDate lastPlayDate;
+
     public void completeProfile() {
         this.fullProfile = true;
     }
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void recordHeartbeat(java.time.LocalDate today, Long incrementSeconds) {
+        if (this.lastPlayDate == null || !this.lastPlayDate.equals(today)) {
+            this.todayPlayTime = 0L;
+            this.lastPlayDate = today;
+        }
+        this.todayPlayTime += incrementSeconds;
     }
 }

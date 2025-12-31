@@ -124,4 +124,30 @@ public class UserService {
                 // 5. Delete User
                 userRepository.delete(user);
         }
+
+        @Transactional
+        public void recordHeartbeat(Long userId) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                user.recordHeartbeat(java.time.LocalDate.now(), 60L);
+        }
+
+        @Transactional(readOnly = true)
+        public Long getPlayTime(Long userId) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+                // If the last play date is not today, the play time is effectively 0 for today
+                // (Though we might want to return the stored time if we want to show
+                // "yesterday's" time before first heartbeat?
+                // But the requirement says "current access time". If it's a new day, it should
+                // resume from 0 or start accumulating)
+                // However, without a heartbeat, the DB might still show old time.
+                // Let's rely on the client to start heartbeating.
+                // But for display purposes, if date is old, return 0.
+                if (user.getLastPlayDate() == null || !user.getLastPlayDate().equals(java.time.LocalDate.now())) {
+                        return 0L;
+                }
+                return user.getTodayPlayTime();
+        }
 }
