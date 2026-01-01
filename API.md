@@ -1,51 +1,75 @@
-# PIN Authentication API
 
-## 1. PIN Setup (설정)
-**URI**: `POST /api/pin/setup`
-**JSON**:
-```json
-{
-  "pin": "1234"
-}
-```
-**Role**: PIN 번호를 처음 설정하거나 변경합니다.
+## PIN Security & Lockout System
 
-## 2. PIN Verify (검증)
-**URI**: `POST /api/pin/verify`
-**JSON**:
-```json
-{
-  "pin": "1234"
-}
-```
-**Role**: 입력된 PIN 번호가 맞는지 검증합니다. 5회 실패 시 계정이 잠깁니다.
+> [!NOTE]
+> All endpoints require a valid Access Token headers.
+> The PIN is locked automatically after 5 consecutive failed attempts.
 
-## 3. Unlock with Code (이메일 인증으로 잠금 해제)
-**URI**: `POST /api/pin/lock/verify`
-**JSON**:
-```json
-{
-  "code": "123456"
-}
-```
-**Role**: 계정이 잠겼을 때 이메일로 전송된 인증 코드를 입력하여 잠금을 해제합니다.
+### 1. Check PIN Status
+Retrieve the current failure count and lock status.
+- **URL**: `/api/pin/status`
+- **Method**: `GET`
+- **Response**: `200 OK`
+    ```json
+    {
+      "registered": true,  // Recently added: true if user has a PIN set
+      "failureCount": 0,   // Current failed attempts (0-5)
+      "locked": false      // true if failureCount >= 5
+    }
+    ```
+    *If not registered, returns `registered: false` (no more 400 errors).*
 
-## 4. Resend Unlock Code (인증 코드 재전송)
-**URI**: `POST /api/pin/lock/resend`
-**JSON**: (Empty Body)
-**Role**: 잠금 해제 인증 코드를 이메일로 재전송합니다.
+### 2. Verify PIN (Test Lockout)
+Attempt to verify PIN. 
+- **URL**: `/api/pin/verify`
+- **Method**: `POST`
+- **Request Body**:
+    ```json
+    {
+      "pin": "123456"
+    }
+    ```
+- **Response**:
+    - **Success (Match)**: `200 OK` - `true` (failureCount resets to 0)
+    - **Failure (Mismatch)**: `200 OK` - `false` (failureCount increments)
+    - **Locked**: `200 OK` with Error or `400/500` depending on global handler (Currently throws `IllegalArgumentException: PIN blocked...`)
 
-## 5. Toggle PIN (PIN 사용 여부 토글)
-**URI**: `POST /api/pin/toggle?enable=true` (or `false`)
-**JSON**: (Empty Body)
-**Role**: PIN 기능을 켜거나 끕니다.
+### 3. Request Unlock Code
+Request a 6-digit verification code to be sent to the user's email.
+- **URL**: `/api/pin/unlock-request`
+- **Method**: `POST`
+- **Response**: `200 OK` (Email sent)
 
-## 6. Change PIN (PIN 변경)
-**URI**: `POST /api/pin/change`
-**JSON**:
-```json
-{
-  "pin": "5678"
-}
-```
-**Role**: 로그인 상태에서(잠기지 않은 경우) PIN 번호를 변경합니다. Setup과 역할이 비슷하지만 명시적으로 변경 의도를 가집니다.
+### 4. Unlock PIN (Delete PIN)
+Enter the code received via email. **Upon success, the PIN is completely removed/disabled.** The user will no longer have a PIN.
+- **URL**: `/api/pin/unlock`
+- **Method**: `POST`
+- **Request Body**:
+    ```json
+    {
+      "code": "123456" // The 6-digit code from email
+    }
+    ```
+- **Response**: `200 OK` (PIN deleted)
+
+---
+
+### Recommended Postman Test Flow
+
+1. **Check Initial Status**
+    - `GET /api/pin/status` -> Expect `failureCount: 0`, `locked: false`
+2. **Intentionally Fail 5 Times**
+    - `POST /api/pin/verify` with wrong PIN x5
+    - Check `GET /api/pin/status` after each -> Count increases.
+    - After 5th fail -> Expect `locked: true`.
+3. **Verify Lockout**
+    - `POST /api/pin/verify` with **CORRECT** or **WRONG** PIN.
+    - Expect Error: "PIN blocked due to too many failed attempts".
+4. **Request Unlock**
+    - `POST /api/pin/unlock-request`
+    - Check Console/Logs (or Mock) for the generated code if email is not working locally, or check actual email.
+5. **Unlock (Delete PIN)**
+    - `POST /api/pin/unlock` with the code.
+6. **Verify Deletion**
+    - `GET /api/pin/check` -> Expect `false`.
+    - `GET /api/pin/status` -> Expect Error (PIN not set for this user).

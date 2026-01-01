@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JwtResponse {
     private String accessToken;
+    private boolean isPinSet;
     @Builder.Default
     private String tokenType = "Bearer";
 }

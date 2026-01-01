@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final com.project.byeoryback.domain.pin.repository.PinRepository pinRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -72,9 +73,11 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile(), user.getProvider().name());
+        boolean isPinSet = pinRepository.existsByUser(user);
 
         return JwtResponse.builder()
                 .accessToken(jwt)
+                .isPinSet(isPinSet)
                 .build();
     }
 
@@ -102,9 +105,11 @@ public class AuthService {
         }
 
         String jwt = jwtUtil.generateToken(user.getEmail(), user.isFullProfile(), user.getProvider().name());
+        boolean isPinSet = pinRepository.existsByUser(user);
 
         return JwtResponse.builder()
                 .accessToken(jwt)
+                .isPinSet(isPinSet)
                 .build();
     }
 

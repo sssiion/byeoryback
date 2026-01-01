@@ -1,12 +1,10 @@
-package com.project.byeoryback.domain.auth.dto;
+package com.project.byeoryback.domain.pin.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
-public class PinRequest {
+public class PinVerifyRequest {
     private String pin;
 }
