@@ -52,6 +52,10 @@ public class Post {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isFavorite = false;
+
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -66,11 +70,14 @@ public class Post {
     }
 
     public void update(String title, List<Block> blocks, List<FloatingItem> stickers,
-            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages) {
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite) {
         this.title = title;
         this.blocks = blocks;
         this.stickers = stickers;
         this.floatingTexts = floatingTexts;
         this.floatingImages = floatingImages;
+        if (isFavorite != null) {
+            this.isFavorite = isFavorite;
+        }
     }
 }

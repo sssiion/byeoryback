@@ -6,6 +6,7 @@ import com.project.byeoryback.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -25,14 +26,18 @@ public class PostController {
 
     // 2. 저장 (Create)
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
-        return ResponseEntity.ok(postService.createPost(request));
+    public ResponseEntity<Post> createPost(
+            @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
+            @RequestBody PostRequest request) {
+        return ResponseEntity.ok(postService.createPost(userDetails.getUser(), request));
     }
 
     // 3. 수정 (Update)
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
-        return ResponseEntity.ok(postService.updatePost(id, request));
+    public ResponseEntity<Post> updatePost(
+            @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
+            @PathVariable Long id, @RequestBody PostRequest request) {
+        return ResponseEntity.ok(postService.updatePost(userDetails.getUser(), id, request));
     }
 
     // 4. 삭제 (Delete)
