@@ -1,6 +1,7 @@
 package com.project.byeoryback.domain.post.service;
 
 import com.project.byeoryback.domain.post.dto.PostRequest;
+import com.project.byeoryback.domain.post.entity.Block;
 import com.project.byeoryback.domain.post.entity.Post;
 import com.project.byeoryback.domain.post.repository.PostRepository;
 import com.project.byeoryback.domain.user.entity.User;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,5 +85,23 @@ public class PostService {
     @Transactional
     public void deletePost(Long id) {
         postRepository.deleteById(id);
+    }
+
+    //사용자 포스트에서 텍스트만 추출
+    @Transactional
+    public List<String> getAllTextsByUserId(Long userId) {
+        // 1. 해당 유저의 모든 게시글의 blocks 필드만 가져옴 (성능 최적화)
+        // 리턴 타입: List<List<Block>> (게시글 여러 개, 각 게시글마다 블록 리스트 존재)
+        List<List<Block>> allPostBlocks = postRepository.findBlocksByUserId(userId);
+
+        // 2. Stream을 사용하여 text만 추출
+        List<String> allTexts = allPostBlocks.stream()
+                .filter(Objects::nonNull)       // blocks 자체가 null인 경우 제외
+                .flatMap(List::stream)          // List<Block> -> Block 스트림으로 펼침 (평탄화)
+                .map(Block::getText)            // Block 객체에서 text 필드만 추출
+                .filter(text -> text != null && !text.isBlank()) // 텍스트가 비어있거나 null인 경우 제외
+                .collect(Collectors.toList());  // 리스트로 수집
+
+        return allTexts;
     }
 }

@@ -46,4 +46,9 @@ public class PostController {
         postService.deletePost(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/persona/{id}")
+    public ResponseEntity<List<String>> getAllTextsByUserId(@PathVariable Long id){
+        return ResponseEntity.ok(postService.getAllTextsByUserId(id));
+    }
 }
