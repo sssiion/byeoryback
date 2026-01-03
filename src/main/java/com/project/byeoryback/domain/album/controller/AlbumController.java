@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/albums")
@@ -29,14 +28,49 @@ public class AlbumController {
         return ResponseEntity.ok(albumService.getUnclassifiedPosts(userDetails.getUser().getId()));
     }
 
+    @GetMapping
+    public ResponseEntity<List<com.project.byeoryback.domain.album.dto.AlbumResponse>> getAllAlbums(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(albumService.getAllAlbums(userDetails.getUser().getId()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<com.project.byeoryback.domain.album.dto.AlbumResponse> getAlbumById(@PathVariable Long id) {
+        return ResponseEntity.ok(albumService.getAlbumById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<com.project.byeoryback.domain.album.dto.AlbumResponse> createAlbum(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody com.project.byeoryback.domain.album.dto.AlbumRequest request) {
+        return ResponseEntity.ok(albumService.createAlbum(userDetails.getUser(), request));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<com.project.byeoryback.domain.album.dto.AlbumResponse> updateAlbum(
+            @PathVariable Long id,
+            @RequestBody com.project.byeoryback.domain.album.dto.AlbumRequest request) {
+        return ResponseEntity.ok(albumService.updateAlbum(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAlbum(@PathVariable Long id) {
+        albumService.deleteAlbum(id);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{id}/manage")
     public ResponseEntity<Void> manageAlbumContent(
             @PathVariable Long id,
-            @RequestBody Map<String, Object> request) {
+            @RequestBody com.project.byeoryback.domain.album.dto.AlbumManageRequest request) {
 
-        String action = (String) request.get("action"); // "ADD" or "REMOVE"
-        Long contentId = ((Number) request.get("contentId")).longValue();
-        String typeStr = (String) request.get("type"); // "POST"
+        String action = request.getAction();
+        Long contentId = request.getContentId();
+        String typeStr = request.getType();
+
+        if (contentId == null || typeStr == null || action == null) {
+            throw new IllegalArgumentException("contentId, type, and action are required");
+        }
 
         AlbumContent.ContentType type = AlbumContent.ContentType.valueOf(typeStr);
 
@@ -44,6 +78,12 @@ public class AlbumController {
             albumService.addContentToAlbum(id, contentId, type);
         } else if ("REMOVE".equalsIgnoreCase(action)) {
             albumService.removeContentFromAlbum(id, contentId, type);
+        } else if ("MOVE".equalsIgnoreCase(action)) {
+            Long sourceAlbumId = request.getSourceAlbumId();
+            if (sourceAlbumId == null) {
+                throw new IllegalArgumentException("sourceAlbumId is required for MOVE action");
+            }
+            albumService.moveContent(id, sourceAlbumId, contentId, type);
         }
 
         return ResponseEntity.ok().build();

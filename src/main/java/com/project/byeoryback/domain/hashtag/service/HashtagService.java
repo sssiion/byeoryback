@@ -23,28 +23,43 @@ public class HashtagService {
 
     @Transactional
     public void processHashtags(Post post, List<String> tagNames) {
-        // Clear existing tags for this post
-        postHashtagRepository.deleteAllByPostId(post.getId());
+        // 1. Clear existing tags using entity method (Cascade will handle deletion)
+        post.clearPostHashtags();
 
         if (tagNames == null || tagNames.isEmpty()) {
             return;
         }
 
-        // Remove duplicates from input
+        // 2. Remove duplicates from input
         Set<String> uniqueNames = tagNames.stream()
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toSet());
 
+        // 3. Add new tags
         for (String name : uniqueNames) {
             Hashtag hashtag = hashtagRepository.findByName(name)
                     .orElseGet(() -> hashtagRepository.save(Hashtag.builder().name(name).build()));
 
-            postHashtagRepository.save(PostHashtag.builder()
+            PostHashtag postHashtag = PostHashtag.builder()
                     .post(post)
                     .hashtag(hashtag)
-                    .build());
+                    .build();
+
+            post.addPostHashtag(postHashtag);
         }
+        // No explicit save needed for PostHashtag if Post is saved appropriately or
+        // transaction commits
+    }
+
+    @Transactional
+    public Hashtag findOrCreate(String name) {
+        String trimmedName = name.trim();
+        if (trimmedName.isEmpty()) {
+            return null;
+        }
+        return hashtagRepository.findByName(trimmedName)
+                .orElseGet(() -> hashtagRepository.save(Hashtag.builder().name(trimmedName).build()));
     }
 
     public List<String> getHashtagsByPost(Long postId) {

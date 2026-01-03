@@ -1,7 +1,9 @@
 package com.project.byeoryback.domain.album.dto;
 
 import com.project.byeoryback.domain.post.entity.Post;
-import com.project.byeoryback.domain.album.entity.Folder;
+import com.project.byeoryback.domain.post.dto.PostResponse;
+import com.project.byeoryback.domain.album.entity.Album;
+import com.project.byeoryback.domain.album.dto.AlbumResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,20 +11,20 @@ import lombok.Getter;
 @Builder
 public class AlbumContentResponseDto {
     private Long id; // AlbumContent ID (null if auto-generated)
-    private String type; // POST, FOLDER
-    private Object content; // PostDto or FolderDto
+    private String type; // POST, ALBUM
+    private Object content; // PostResponse or Album(Model)
 
     public static AlbumContentResponseDto fromPost(Post post) {
         return AlbumContentResponseDto.builder()
                 .type("POST")
-                .content(post) // In real app, use PostResponseDto
+                .content(PostResponse.from(post))
                 .build();
     }
 
-    public static AlbumContentResponseDto fromFolder(Folder folder) {
+    public static AlbumContentResponseDto fromAlbum(Album album) {
         return AlbumContentResponseDto.builder()
-                .type("FOLDER")
-                .content(folder)
+                .type("ALBUM")
+                .content(AlbumResponse.from(album)) // Use DTO to avoid recursion/proxy issues
                 .build();
     }
 }

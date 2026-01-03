@@ -9,6 +9,7 @@ import com.project.byeoryback.domain.hashtag.entity.PostHashtag;
 import com.project.byeoryback.domain.hashtag.repository.PostHashtagRepository;
 import com.project.byeoryback.domain.post.entity.Post;
 import com.project.byeoryback.domain.post.repository.PostRepository;
+import com.project.byeoryback.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class AlbumService {
     private final AlbumContentRepository albumContentRepository;
     private final PostHashtagRepository postHashtagRepository;
     private final PostRepository postRepository;
+    private final com.project.byeoryback.domain.hashtag.service.HashtagService hashtagService;
 
     public List<AlbumContentResponseDto> getAlbumContents(Long albumId) {
         Album album = albumRepository.findById(albumId)
@@ -32,7 +34,15 @@ public class AlbumService {
         List<AlbumContentResponseDto> result = new ArrayList<>();
         Set<Long> addedPostIds = new HashSet<>();
 
-        // 1. Get Manual Contents (AlbumContent)
+        // 1. Get Sub-Albums (Nested)
+        List<Album> subAlbums = albumRepository.findByParentId(albumId);
+        List<Long> subAlbumIds = new ArrayList<>();
+        for (Album subAlbum : subAlbums) {
+            result.add(AlbumContentResponseDto.fromAlbum(subAlbum));
+            subAlbumIds.add(subAlbum.getId());
+        }
+
+        // 2. Get Manual Contents (AlbumContent - Posts)
         List<AlbumContent> manualContents = albumContentRepository.findAllByParentAlbumId(albumId);
         for (AlbumContent content : manualContents) {
             if (content.getContentType() == AlbumContent.ContentType.POST) {
@@ -41,20 +51,29 @@ public class AlbumService {
                     result.add(AlbumContentResponseDto.fromPost(post));
                     addedPostIds.add(post.getId());
                 }
-            } else if (content.getContentType() == AlbumContent.ContentType.FOLDER) {
-                // Folder logic if needed
-                result.add(AlbumContentResponseDto.fromFolder(content.getChildFolder()));
             }
         }
 
-        // 2. Get Auto Contents (Hashtag match)
+        // Pre-fetch contents of sub-albums to exclude them from auto-grouping
+        Set<Long> subAlbumPostIds = new HashSet<>();
+        if (!subAlbumIds.isEmpty()) {
+            List<AlbumContent> subAlbumContents = albumContentRepository.findAllByParentAlbumIdIn(subAlbumIds);
+            for (AlbumContent content : subAlbumContents) {
+                if (content.getContentType() == AlbumContent.ContentType.POST && content.getChildPost() != null) {
+                    subAlbumPostIds.add(content.getChildPost().getId());
+                }
+            }
+        }
+
+        // 3. Get Auto Contents (Hashtag match)
         if (album.getRepresentativeHashtag() != null) {
             List<PostHashtag> taggedPosts = postHashtagRepository
                     .findAllByHashtagId(album.getRepresentativeHashtag().getId());
             for (PostHashtag ph : taggedPosts) {
                 Post post = ph.getPost();
-                // Deduplication: Only add if not already added manually
-                if (!addedPostIds.contains(post.getId())) {
+                // Deduplication & Exclusion:
+                // Only add if not already added manually AND not present in any sub-album
+                if (!addedPostIds.contains(post.getId()) && !subAlbumPostIds.contains(post.getId())) {
                     result.add(AlbumContentResponseDto.fromPost(post));
                     addedPostIds.add(post.getId());
                 }
@@ -66,6 +85,77 @@ public class AlbumService {
 
     public List<Post> getUnclassifiedPosts(Long userId) {
         return postRepository.findUnclassifiedPosts(userId);
+    }
+
+    // CRUD Implementations
+    public List<com.project.byeoryback.domain.album.dto.AlbumResponse> getAllAlbums(Long userId) {
+        return albumRepository.findAllByUserId(userId).stream()
+                .map(com.project.byeoryback.domain.album.dto.AlbumResponse::from)
+                .toList();
+    }
+
+    public com.project.byeoryback.domain.album.dto.AlbumResponse getAlbumById(Long id) {
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Album not found"));
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album);
+    }
+
+    @Transactional
+    public com.project.byeoryback.domain.album.dto.AlbumResponse createAlbum(User user,
+            com.project.byeoryback.domain.album.dto.AlbumRequest request) {
+        Album parent = null;
+        if (request.getParentId() != null) {
+            parent = albumRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent album not found"));
+        }
+
+        com.project.byeoryback.domain.hashtag.entity.Hashtag hashtag = null;
+        if (request.getTag() != null) {
+            // Need a way to find or create hashtag using service, or finding repo directly.
+            // Assuming hashtagService.findOrCreate... but service is better.
+            // For now, let's assume direct usage or service call if exposed.
+            // Let's rely on Repo for finding, service for creating?
+            // Actually hashtagService is injected.
+            hashtag = hashtagService.findOrCreate(request.getTag());
+        }
+
+        Album album = Album.builder()
+                .name(request.getName())
+                .user(user)
+                .parent(parent)
+                .representativeHashtag(hashtag)
+                .isFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false)
+                .build();
+
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(albumRepository.save(album));
+    }
+
+    @Transactional
+    public com.project.byeoryback.domain.album.dto.AlbumResponse updateAlbum(Long id,
+            com.project.byeoryback.domain.album.dto.AlbumRequest request) {
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Album not found"));
+
+        Album parent = null;
+        if (request.getParentId() != null) {
+            parent = albumRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent album not found"));
+        }
+
+        com.project.byeoryback.domain.hashtag.entity.Hashtag hashtag = null;
+        if (request.getTag() != null) {
+            hashtag = hashtagService.findOrCreate(request.getTag());
+        }
+
+        album.update(request.getName(), parent, hashtag, request.getIsFavorite());
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album);
+    }
+
+    @Transactional
+    public void deleteAlbum(Long id) {
+        // Cascade delete or check? Enforced by DB constraint or JPA cascade.
+        // Assuming cascade is fine for now on children contents.
+        albumRepository.deleteById(id);
     }
 
     @Transactional
@@ -89,7 +179,6 @@ public class AlbumService {
                         .build());
             }
         }
-        // Add folder logic if needed
     }
 
     @Transactional
@@ -101,5 +190,14 @@ public class AlbumService {
                 albumContentRepository.delete(content);
             }
         }
+    }
+
+    @Transactional
+    public void moveContent(Long targetAlbumId, Long sourceAlbumId, Long contentId, AlbumContent.ContentType type) {
+        // 1. Add to target
+        addContentToAlbum(targetAlbumId, contentId, type);
+
+        // 2. Remove from source
+        removeContentFromAlbum(sourceAlbumId, contentId, type);
     }
 }

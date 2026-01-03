@@ -1,6 +1,8 @@
 package com.project.byeoryback.domain.post.entity;
 
 import com.project.byeoryback.domain.user.entity.User;
+import com.project.byeoryback.domain.album.entity.AlbumContent;
+import com.project.byeoryback.domain.hashtag.entity.PostHashtag;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -23,6 +25,13 @@ public class Post {
 
     @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private java.util.Map<String, Object> titleStyles;
+
+    @Column(length = 10)
+    private String mode; // "AUTO", "MANUAL"
 
     // 작성자 연결 (User 엔티티와 관계 설정)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,6 +58,14 @@ public class Post {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<FloatingItem> floatingImages;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostHashtag> postHashtags = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "childPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AlbumContent> albumContents = new java.util.ArrayList<>();
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -69,9 +86,11 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String title, List<Block> blocks, List<FloatingItem> stickers,
-            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite) {
+    public void update(String title, java.util.Map<String, Object> titleStyles, List<Block> blocks,
+            List<FloatingItem> stickers,
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode) {
         this.title = title;
+        this.titleStyles = titleStyles;
         this.blocks = blocks;
         this.stickers = stickers;
         this.floatingTexts = floatingTexts;
@@ -79,5 +98,15 @@ public class Post {
         if (isFavorite != null) {
             this.isFavorite = isFavorite;
         }
+        this.mode = mode;
+        this.mode = mode;
+    }
+
+    public void clearPostHashtags() {
+        this.postHashtags.clear();
+    }
+
+    public void addPostHashtag(PostHashtag postHashtag) {
+        this.postHashtags.add(postHashtag);
     }
 }

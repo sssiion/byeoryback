@@ -7,7 +7,7 @@ import java.util.List;
 public interface AlbumContentRepository extends JpaRepository<AlbumContent, Long> {
     List<AlbumContent> findAllByParentAlbumId(Long parentAlbumId);
 
-    List<AlbumContent> findAllByParentFolderId(Long parentFolderId);
+    List<AlbumContent> findAllByParentAlbumIdIn(List<Long> parentAlbumIds);
 
     void deleteAllByChildPostId(Long postId);
 }

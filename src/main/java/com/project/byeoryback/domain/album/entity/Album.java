@@ -30,6 +30,10 @@ public class Album {
     @JoinColumn(name = "representative_hashtag_id")
     private Hashtag representativeHashtag;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Album parent;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean isFavorite = false;
@@ -48,5 +52,14 @@ public class Album {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void update(String name, Album parent, Hashtag representativeHashtag, Boolean isFavorite) {
+        this.name = name;
+        this.parent = parent;
+        this.representativeHashtag = representativeHashtag;
+        if (isFavorite != null) {
+            this.isFavorite = isFavorite;
+        }
     }
 }

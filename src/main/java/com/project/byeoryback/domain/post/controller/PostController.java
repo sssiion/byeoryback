@@ -1,6 +1,7 @@
 package com.project.byeoryback.domain.post.controller;
 
 import com.project.byeoryback.domain.post.dto.PostRequest;
+import com.project.byeoryback.domain.post.dto.PostResponse;
 import com.project.byeoryback.domain.post.service.PostService;
 import com.project.byeoryback.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
@@ -20,24 +21,30 @@ public class PostController {
 
     // 1. 목록 조회
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
+        List<Post> posts = postService.getAllPosts();
+        List<PostResponse> response = posts.stream()
+                .map(PostResponse::from)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     // 2. 저장 (Create)
     @PostMapping
-    public ResponseEntity<Post> createPost(
+    public ResponseEntity<PostResponse> createPost(
             @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
             @RequestBody PostRequest request) {
-        return ResponseEntity.ok(postService.createPost(userDetails.getUser(), request));
+        Post post = postService.createPost(userDetails.getUser(), request);
+        return ResponseEntity.ok(PostResponse.from(post));
     }
 
     // 3. 수정 (Update)
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(
+    public ResponseEntity<PostResponse> updatePost(
             @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
             @PathVariable Long id, @RequestBody PostRequest request) {
-        return ResponseEntity.ok(postService.updatePost(userDetails.getUser(), id, request));
+        Post post = postService.updatePost(userDetails.getUser(), id, request);
+        return ResponseEntity.ok(PostResponse.from(post));
     }
 
     // 4. 삭제 (Delete)

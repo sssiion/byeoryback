@@ -35,6 +35,8 @@ public class PostService {
     public Post createPost(User user, PostRequest request) {
         Post post = Post.builder()
                 .title(request.getTitle())
+                .titleStyles(request.getTitleStyles())
+                .mode(request.getMode())
                 .blocks(request.getBlocks())
                 .stickers(request.getStickers())
                 .floatingTexts(request.getFloatingTexts())
@@ -70,11 +72,13 @@ public class PostService {
 
         post.update(
                 request.getTitle(),
+                request.getTitleStyles(),
                 request.getBlocks(),
                 request.getStickers(),
                 request.getFloatingTexts(),
                 request.getFloatingImages(),
-                request.getIsFavorite());
+                request.getIsFavorite(),
+                request.getMode());
 
         hashtagService.processHashtags(post, request.getHashtags());
 
