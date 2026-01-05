@@ -8,4 +8,6 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     List<Album> findAllByUserId(Long userId);
 
     List<Album> findByParentId(Long parentId);
+
+    Long countByParentId(Long parentId);
 }

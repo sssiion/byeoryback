@@ -20,10 +20,10 @@ public class AlbumContentResponseDto {
                 .build();
     }
 
-    public static AlbumContentResponseDto fromAlbum(Album album) {
+    public static AlbumContentResponseDto fromAlbum(Album album, Long folderCount, Long postCount) {
         return AlbumContentResponseDto.builder()
                 .type("ALBUM")
-                .content(AlbumResponse.from(album)) // Use DTO to avoid recursion/proxy issues
+                .content(com.project.byeoryback.domain.album.dto.AlbumResponse.from(album, folderCount, postCount))
                 .build();
     }
 }

@@ -16,7 +16,10 @@ public class AlbumResponse {
     private Boolean isFavorite;
     private LocalDateTime createdAt;
 
-    public static AlbumResponse from(Album album) {
+    private Long folderCount;
+    private Long postCount;
+
+    public static AlbumResponse from(Album album, Long folderCount, Long postCount) {
         return AlbumResponse.builder()
                 .id(album.getId())
                 .name(album.getName())
@@ -24,6 +27,8 @@ public class AlbumResponse {
                 .parentId(album.getParent() != null ? album.getParent().getId() : null)
                 .isFavorite(album.getIsFavorite())
                 .createdAt(album.getCreatedAt())
+                .folderCount(folderCount)
+                .postCount(postCount)
                 .build();
     }
 }

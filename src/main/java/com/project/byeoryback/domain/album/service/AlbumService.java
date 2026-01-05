@@ -38,7 +38,18 @@ public class AlbumService {
         List<Album> subAlbums = albumRepository.findByParentId(albumId);
         List<Long> subAlbumIds = new ArrayList<>();
         for (Album subAlbum : subAlbums) {
-            result.add(AlbumContentResponseDto.fromAlbum(subAlbum));
+            // Need counts for sub-albums too when displaying as content?
+            // The DTO for AlbumContentResponseDto.fromAlbum uses AlbumResponse.from(album).
+            // This will break compilation if we don't update fromAlbum or AlbumResponse
+            // usage.
+            // Let's first update AlbumContentResponseDto to handle the new signature or
+            // logic.
+            // Wait, AlbumContentResponseDto.fromAlbum calls AlbumResponse.from(album).
+            // I need to calculate counts for this subAlbum.
+            Long folderCount = getFolderCount(subAlbum.getId());
+            Long postCount = getPostCount(subAlbum);
+
+            result.add(AlbumContentResponseDto.fromAlbum(subAlbum, folderCount, postCount));
             subAlbumIds.add(subAlbum.getId());
         }
 
@@ -71,8 +82,6 @@ public class AlbumService {
                     .findAllByHashtagId(album.getRepresentativeHashtag().getId());
             for (PostHashtag ph : taggedPosts) {
                 Post post = ph.getPost();
-                // Deduplication & Exclusion:
-                // Only add if not already added manually AND not present in any sub-album
                 if (!addedPostIds.contains(post.getId()) && !subAlbumPostIds.contains(post.getId())) {
                     result.add(AlbumContentResponseDto.fromPost(post));
                     addedPostIds.add(post.getId());
@@ -87,17 +96,69 @@ public class AlbumService {
         return postRepository.findUnclassifiedPosts(userId);
     }
 
+    // New helper methods
+    private Long getFolderCount(Long albumId) {
+        return albumRepository.countByParentId(albumId);
+    }
+
+    private Long getPostCount(Album album) {
+        // Collect all related album IDs (recursive)
+        Set<Long> allAlbumIds = new HashSet<>();
+        collectSubAlbumIds(album.getId(), allAlbumIds);
+        allAlbumIds.add(album.getId());
+
+        Set<Long> uniquePostIds = new HashSet<>();
+
+        // 1. Manual Posts for all current and sub albums
+        List<AlbumContent> contents = albumContentRepository.findAllByParentAlbumIdIn(new ArrayList<>(allAlbumIds));
+        for (AlbumContent content : contents) {
+            if (content.getContentType() == AlbumContent.ContentType.POST && content.getChildPost() != null) {
+                uniquePostIds.add(content.getChildPost().getId());
+            }
+        }
+
+        // 2. Hashtag Posts for all current and sub albums
+        // Getting albums again to access hashtag info...
+        List<Album> allAlbums = albumRepository.findAllById(allAlbumIds);
+        for (Album a : allAlbums) {
+            if (a.getRepresentativeHashtag() != null) {
+                List<PostHashtag> taggedPosts = postHashtagRepository
+                        .findAllByHashtagId(a.getRepresentativeHashtag().getId());
+                for (PostHashtag ph : taggedPosts) {
+                    uniquePostIds.add(ph.getPost().getId());
+                }
+            }
+        }
+
+        return (long) uniquePostIds.size();
+    }
+
+    private void collectSubAlbumIds(Long parentId, Set<Long> ids) {
+        List<Album> children = albumRepository.findByParentId(parentId);
+        for (Album child : children) {
+            ids.add(child.getId());
+            collectSubAlbumIds(child.getId(), ids);
+        }
+    }
+
     // CRUD Implementations
     public List<com.project.byeoryback.domain.album.dto.AlbumResponse> getAllAlbums(Long userId) {
-        return albumRepository.findAllByUserId(userId).stream()
-                .map(com.project.byeoryback.domain.album.dto.AlbumResponse::from)
+        List<Album> albums = albumRepository.findAllByUserId(userId);
+        return albums.stream()
+                .map(album -> {
+                    Long folderCount = getFolderCount(album.getId());
+                    Long postCount = getPostCount(album);
+                    return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album, folderCount, postCount);
+                })
                 .toList();
     }
 
     public com.project.byeoryback.domain.album.dto.AlbumResponse getAlbumById(Long id) {
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
-        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album);
+        Long folderCount = getFolderCount(album.getId());
+        Long postCount = getPostCount(album);
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album, folderCount, postCount);
     }
 
     @Transactional
@@ -111,11 +172,6 @@ public class AlbumService {
 
         com.project.byeoryback.domain.hashtag.entity.Hashtag hashtag = null;
         if (request.getTag() != null) {
-            // Need a way to find or create hashtag using service, or finding repo directly.
-            // Assuming hashtagService.findOrCreate... but service is better.
-            // For now, let's assume direct usage or service call if exposed.
-            // Let's rely on Repo for finding, service for creating?
-            // Actually hashtagService is injected.
             hashtag = hashtagService.findOrCreate(request.getTag());
         }
 
@@ -127,7 +183,12 @@ public class AlbumService {
                 .isFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false)
                 .build();
 
-        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(albumRepository.save(album));
+        Album savedAlbum = albumRepository.save(album);
+        // New album has 0 folders, 0 posts usually, but hashtag might auto-link posts
+        // instantly?
+        // Yes, if hashtag exists.
+        Long postCount = getPostCount(savedAlbum); // Calculates based on hashtag
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(savedAlbum, 0L, postCount);
     }
 
     @Transactional
@@ -148,13 +209,16 @@ public class AlbumService {
         }
 
         album.update(request.getName(), parent, hashtag, request.getIsFavorite());
-        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album);
+
+        // Recalculate counts
+        Long folderCount = getFolderCount(album.getId());
+        Long postCount = getPostCount(album);
+
+        return com.project.byeoryback.domain.album.dto.AlbumResponse.from(album, folderCount, postCount);
     }
 
     @Transactional
     public void deleteAlbum(Long id) {
-        // Cascade delete or check? Enforced by DB constraint or JPA cascade.
-        // Assuming cascade is fine for now on children contents.
         albumRepository.deleteById(id);
     }
 
@@ -167,7 +231,6 @@ public class AlbumService {
             Post post = postRepository.findById(contentId)
                     .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-            // Check if already exists
             boolean exists = albumContentRepository.findAllByParentAlbumId(albumId).stream()
                     .anyMatch(ac -> ac.getChildPost() != null && ac.getChildPost().getId().equals(contentId));
 
@@ -194,10 +257,7 @@ public class AlbumService {
 
     @Transactional
     public void moveContent(Long targetAlbumId, Long sourceAlbumId, Long contentId, AlbumContent.ContentType type) {
-        // 1. Add to target
         addContentToAlbum(targetAlbumId, contentId, type);
-
-        // 2. Remove from source
         removeContentFromAlbum(sourceAlbumId, contentId, type);
     }
 }
