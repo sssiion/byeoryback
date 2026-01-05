@@ -3,7 +3,6 @@ package com.project.byeoryback.domain.album.dto;
 import com.project.byeoryback.domain.post.entity.Post;
 import com.project.byeoryback.domain.post.dto.PostResponse;
 import com.project.byeoryback.domain.album.entity.Album;
-import com.project.byeoryback.domain.album.dto.AlbumResponse;
 import lombok.Builder;
 import lombok.Getter;
 
