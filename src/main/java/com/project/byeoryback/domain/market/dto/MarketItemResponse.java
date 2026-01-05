@@ -22,8 +22,10 @@ public class MarketItemResponse {
     private String contentJson;
     private String status;
     private LocalDateTime createdAt;
+    private Long salesCount;
+    private String referenceId;
 
-    public static MarketItemResponse from(MarketItem item) {
+    public static MarketItemResponse from(MarketItem item, Long salesCount) {
         return MarketItemResponse.builder()
                 .id(item.getId())
                 .sellerId(item.getSeller() != null ? item.getSeller().getId() : null)
@@ -35,6 +37,8 @@ public class MarketItemResponse {
                 .contentJson(item.getContentJson())
                 .status(item.getStatus().name())
                 .createdAt(item.getCreatedAt())
+                .salesCount(salesCount)
+                .referenceId(item.getReferenceId())
                 .build();
     }
 }

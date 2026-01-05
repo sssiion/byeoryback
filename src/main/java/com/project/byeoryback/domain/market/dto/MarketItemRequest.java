@@ -14,4 +14,5 @@ public class MarketItemRequest {
     private Long price;
     private String category;
     private String contentJson;
+    private String referenceId;
 }

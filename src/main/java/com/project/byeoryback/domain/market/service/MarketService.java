@@ -10,6 +10,8 @@ import com.project.byeoryback.domain.market.repository.MarketTransactionReposito
 import com.project.byeoryback.domain.user.entity.User;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +27,22 @@ public class MarketService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<MarketItemResponse> getAllOnSaleItems() {
-        return itemRepository.findByStatusOrderByCreatedAtDesc(MarketItemStatus.ON_SALE)
-                .stream()
-                .map(MarketItemResponse::from)
-                .collect(Collectors.toList());
+    public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Pageable pageable) {
+        Page<MarketItem> items;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            items = itemRepository.findByNameContainingAndStatus(keyword, MarketItemStatus.ON_SALE, pageable);
+        } else {
+            items = itemRepository.findByStatus(MarketItemStatus.ON_SALE, pageable);
+        }
+
+        return items.map(item -> MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId())));
     }
 
     @Transactional(readOnly = true)
     public List<MarketItemResponse> getMySellingItems(Long userId) {
         return itemRepository.findBySellerId(userId)
                 .stream()
-                .map(MarketItemResponse::from)
+                .map(item -> MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -44,7 +50,8 @@ public class MarketService {
     public List<MarketItemResponse> getMyPurchasedItems(Long userId) {
         return transactionRepository.findByBuyerIdOrderByTransactionDateDesc(userId)
                 .stream()
-                .map(t -> MarketItemResponse.from(t.getItem()))
+                .map(t -> MarketItemResponse.from(t.getItem(),
+                        transactionRepository.countByItemId(t.getItem().getId())))
                 .collect(Collectors.toList());
     }
 
@@ -53,16 +60,24 @@ public class MarketService {
         User seller = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        if (request.getReferenceId() != null && !request.getReferenceId().isEmpty()) {
+            if (itemRepository.existsBySellerIdAndReferenceIdAndStatus(userId, request.getReferenceId(),
+                    MarketItemStatus.ON_SALE)) {
+                throw new IllegalStateException("이미 마켓에 등록된 아이템입니다.");
+            }
+        }
+
         MarketItem item = MarketItem.builder()
                 .seller(seller)
                 .name(request.getName())
                 .price(request.getPrice())
                 .category(request.getCategory())
                 .contentJson(request.getContentJson())
+                .referenceId(request.getReferenceId())
                 .status(MarketItemStatus.ON_SALE)
                 .build();
 
-        return MarketItemResponse.from(itemRepository.save(item));
+        return MarketItemResponse.from(itemRepository.save(item), 0L);
     }
 
     @Transactional
@@ -73,8 +88,8 @@ public class MarketService {
         MarketItem item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found"));
 
-        if (item.getStatus() == MarketItemStatus.SOLD) {
-            throw new IllegalStateException("Item is already sold");
+        if (item.getStatus() == MarketItemStatus.CANCELLED) {
+            throw new IllegalStateException("Item sale is cancelled");
         }
 
         if (item.getSeller() != null && item.getSeller().getId().equals(userId)) {
@@ -103,7 +118,7 @@ public class MarketService {
             seller.addCredits(item.getPrice());
             userRepository.save(seller); // Update seller credits
 
-            item.markAsSold();
+            // item.markAsSold(); // REMOVED: Items are digital goods (unlimited stock)
         } else {
             // System Item - Infinite Stock, Credits disappear (burned)
         }
@@ -116,10 +131,6 @@ public class MarketService {
 
         if (!item.getSeller().getId().equals(userId)) {
             throw new IllegalStateException("Not authorized to cancel this item");
-        }
-
-        if (item.getStatus() == MarketItemStatus.SOLD) {
-            throw new IllegalStateException("Cannot cancel sold item");
         }
 
         item.cancelSale();

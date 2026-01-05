@@ -5,6 +5,8 @@ import com.project.byeoryback.domain.market.dto.MarketItemResponse;
 import com.project.byeoryback.domain.market.service.MarketService;
 import com.project.byeoryback.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +22,10 @@ public class MarketController {
     private final MarketService marketService;
 
     @GetMapping("/items")
-    public ResponseEntity<List<MarketItemResponse>> getAllOnSaleItems() {
-        return ResponseEntity.ok(marketService.getAllOnSaleItems());
+    public ResponseEntity<Page<MarketItemResponse>> getAllOnSaleItems(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, pageable));
     }
 
     @GetMapping("/my-items")

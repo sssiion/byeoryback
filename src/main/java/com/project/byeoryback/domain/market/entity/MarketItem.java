@@ -39,6 +39,9 @@ public class MarketItem {
     @Column(columnDefinition = "TEXT")
     private String contentJson; // Stores JSON string of item data (e.g. image url, styles)
 
+    @Column
+    private String referenceId; // External ID to prevent duplicate listings (e.g. preset ID)
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -46,10 +49,6 @@ public class MarketItem {
 
     @CreatedDate
     private LocalDateTime createdAt;
-
-    public void markAsSold() {
-        this.status = MarketItemStatus.SOLD;
-    }
 
     public void cancelSale() {
         this.status = MarketItemStatus.CANCELLED;

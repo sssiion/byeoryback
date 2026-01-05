@@ -36,6 +36,7 @@ public class UserService {
                                 .orElseThrow(() -> new UserProfileNotFoundException(userId));
 
                 return new UserProfileResponse(
+                                profile.getUser().getId(),
                                 profile.getProfilePhoto(),
                                 profile.getName(),
                                 profile.getNickname(),
