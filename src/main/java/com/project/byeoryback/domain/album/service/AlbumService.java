@@ -38,14 +38,7 @@ public class AlbumService {
         List<Album> subAlbums = albumRepository.findByParentId(albumId);
         List<Long> subAlbumIds = new ArrayList<>();
         for (Album subAlbum : subAlbums) {
-            // Need counts for sub-albums too when displaying as content?
-            // The DTO for AlbumContentResponseDto.fromAlbum uses AlbumResponse.from(album).
-            // This will break compilation if we don't update fromAlbum or AlbumResponse
-            // usage.
-            // Let's first update AlbumContentResponseDto to handle the new signature or
-            // logic.
-            // Wait, AlbumContentResponseDto.fromAlbum calls AlbumResponse.from(album).
-            // I need to calculate counts for this subAlbum.
+
             Long folderCount = getFolderCount(subAlbum.getId());
             Long postCount = getPostCount(subAlbum);
 
@@ -219,6 +212,16 @@ public class AlbumService {
 
     @Transactional
     public void deleteAlbum(Long id) {
+        // 1. Find all sub-albums
+        List<Album> subAlbums = albumRepository.findByParentId(id);
+
+        // 2. Recursively delete sub-albums
+        for (Album subAlbum : subAlbums) {
+            deleteAlbum(subAlbum.getId());
+        }
+
+        // 3. Delete contents (AlbumContent) associated with this album
+
         albumRepository.deleteById(id);
     }
 
