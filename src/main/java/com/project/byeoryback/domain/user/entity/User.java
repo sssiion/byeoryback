@@ -41,6 +41,10 @@ public class User {
     @Builder.Default
     private Long todayPlayTime = 0L; // Seconds
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Long credits = 0L;
+
     private java.time.LocalDate lastPlayDate;
 
     public void completeProfile() {
@@ -57,6 +61,18 @@ public class User {
             this.lastPlayDate = today;
         }
         this.todayPlayTime += incrementSeconds;
+    }
+
+    public void addCredits(Long amount) {
+        this.credits += amount;
+    }
+
+    public boolean spendCredits(Long amount) {
+        if (this.credits < amount) {
+            return false; // Not enough credits
+        }
+        this.credits -= amount;
+        return true;
     }
 
 }

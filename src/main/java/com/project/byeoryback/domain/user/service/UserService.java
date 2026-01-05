@@ -43,7 +43,8 @@ public class UserService {
                                 profile.getBirthDate(),
                                 profile.getPhone(),
                                 profile.getGender(),
-                                profile.getBio());
+                                profile.getBio(),
+                                profile.getUser().getCredits());
         }
 
         @Transactional
@@ -149,5 +150,12 @@ public class UserService {
                         return 0L;
                 }
                 return user.getTodayPlayTime();
+        }
+
+        @Transactional
+        public void addCredits(Long userId, Long amount) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                user.addCredits(amount);
         }
 }
