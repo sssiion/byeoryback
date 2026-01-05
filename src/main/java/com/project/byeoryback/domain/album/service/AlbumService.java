@@ -221,6 +221,8 @@ public class AlbumService {
         }
 
         // 3. Delete contents (AlbumContent) associated with this album
+        List<AlbumContent> contents = albumContentRepository.findAllByParentAlbumId(id);
+        albumContentRepository.deleteAll(contents);
 
         albumRepository.deleteById(id);
     }
