@@ -38,6 +38,10 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private com.project.byeoryback.domain.room.entity.Room room;
+
     // 1. 블록 리스트 (JSON 저장)
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON) // Hibernate 6버전 이상에서 JSON 처리 시 권장

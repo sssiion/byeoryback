@@ -8,7 +8,10 @@ import com.project.byeoryback.domain.room.entity.Room;
 import com.project.byeoryback.domain.room.entity.RoomMember;
 import com.project.byeoryback.domain.room.repository.RoomMemberRepository;
 import com.project.byeoryback.domain.room.repository.RoomRepository;
+import com.project.byeoryback.domain.post.repository.PostRepository;
+import com.project.byeoryback.domain.post.dto.PostResponse;
 import com.project.byeoryback.domain.user.entity.User;
+import com.project.byeoryback.domain.user.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,8 @@ public class RoomService {
     private final RoomMemberRepository roomMemberRepository;
     private final HashtagService hashtagService;
     private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Transactional
     public RoomResponse createRoom(User user, RoomRequest request) {
@@ -93,7 +98,61 @@ public class RoomService {
 
     public List<com.project.byeoryback.domain.room.dto.RoomMemberResponse> getMembers(Long roomId) {
         return roomMemberRepository.findAllByRoomId(roomId).stream()
-                .map(com.project.byeoryback.domain.room.dto.RoomMemberResponse::from)
+                .map(member -> {
+                    String nickname = userProfileRepository.findByUserId(member.getUser().getId())
+                            .map(profile -> profile.getNickname())
+                            .orElse(member.getUser().getEmail().split("@")[0]);
+                    return com.project.byeoryback.domain.room.dto.RoomMemberResponse.from(member, nickname);
+                })
                 .toList();
+    }
+
+    public List<RoomResponse> getAllRooms() {
+        return roomRepository.findAll().stream()
+                .map(RoomResponse::from)
+                .toList();
+    }
+
+    public List<PostResponse> getRoomPosts(Long roomId) {
+        return postRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId).stream()
+                .map(PostResponse::from)
+                .toList();
+    }
+
+    public List<RoomResponse> getMyJoinedRooms(User user) {
+        return roomMemberRepository.findAllByUserId(user.getId()).stream()
+                .map(member -> RoomResponse.from(member.getRoom()))
+                .toList();
+    }
+
+    @Transactional
+    public void leaveRoom(Long roomId, User user) {
+        RoomMember member = roomMemberRepository.findByRoomIdAndUserId(roomId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Not a member of this room"));
+
+        if (member.getRole() == RoomMember.RoomRole.OWNER) {
+            throw new IllegalArgumentException("Owner cannot leave the room. Please delete the room instead.");
+        }
+
+        roomMemberRepository.delete(member);
+    }
+
+    @Transactional
+    public void kickMember(Long roomId, Long targetUserId, User requester) {
+        RoomMember requesterMember = roomMemberRepository.findByRoomIdAndUserId(roomId, requester.getId())
+                .orElseThrow(() -> new IllegalArgumentException("You are not a member of this room"));
+
+        if (requesterMember.getRole() != RoomMember.RoomRole.OWNER) {
+            throw new IllegalArgumentException("Only the owner can kick members");
+        }
+
+        RoomMember targetMember = roomMemberRepository.findByRoomIdAndUserId(roomId, targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Target user is not a member of this room"));
+
+        if (targetMember.getRole() == RoomMember.RoomRole.OWNER) {
+            throw new IllegalArgumentException("Cannot kick the owner");
+        }
+
+        roomMemberRepository.delete(targetMember);
     }
 }

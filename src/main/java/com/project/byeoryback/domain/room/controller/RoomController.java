@@ -4,6 +4,7 @@ import com.project.byeoryback.domain.room.dto.RoomJoinRequest;
 import com.project.byeoryback.domain.room.dto.RoomMemberResponse;
 import com.project.byeoryback.domain.room.dto.RoomRequest;
 import com.project.byeoryback.domain.room.dto.RoomResponse;
+import com.project.byeoryback.domain.post.dto.PostResponse;
 import com.project.byeoryback.domain.room.service.RoomService;
 import com.project.byeoryback.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,16 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+
+    @GetMapping
+    public ResponseEntity<List<RoomResponse>> getRooms() {
+        return ResponseEntity.ok(roomService.getAllRooms());
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<RoomResponse>> getMyRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(roomService.getMyJoinedRooms(userDetails.getUser()));
+    }
 
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(
@@ -45,5 +56,27 @@ public class RoomController {
     @GetMapping("/{id}/members")
     public ResponseEntity<List<RoomMemberResponse>> getMembers(@PathVariable Long id) {
         return ResponseEntity.ok(roomService.getMembers(id));
+    }
+
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<List<PostResponse>> getPosts(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.getRoomPosts(id));
+    }
+
+    @DeleteMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveRoom(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        roomService.leaveRoom(id, userDetails.getUser());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/members/{userId}")
+    public ResponseEntity<Void> kickMember(
+            @PathVariable Long id,
+            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        roomService.kickMember(id, userId, userDetails.getUser());
+        return ResponseEntity.ok().build();
     }
 }
