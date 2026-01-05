@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserProfile userProfile;
+
     @Column(nullable = false, unique = true)
     private String email;
 

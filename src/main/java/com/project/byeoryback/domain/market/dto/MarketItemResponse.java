@@ -24,6 +24,8 @@ public class MarketItemResponse {
     private LocalDateTime createdAt;
     private Long salesCount;
     private String referenceId;
+    private Double averageRating;
+    private int reviewCount;
 
     public static MarketItemResponse from(MarketItem item, Long salesCount) {
         return MarketItemResponse.builder()
@@ -39,6 +41,8 @@ public class MarketItemResponse {
                 .createdAt(item.getCreatedAt())
                 .salesCount(salesCount)
                 .referenceId(item.getReferenceId())
+                .averageRating(item.getAverageRating() != null ? item.getAverageRating() : 0.0)
+                .reviewCount(item.getReviewCount())
                 .build();
     }
 }

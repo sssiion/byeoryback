@@ -22,4 +22,6 @@ public interface MarketItemRepository extends JpaRepository<MarketItem, Long> {
     Page<MarketItem> findByStatus(MarketItemStatus status, Pageable pageable);
 
     boolean existsBySellerIdAndReferenceIdAndStatus(Long sellerId, String referenceId, MarketItemStatus status);
+
+    boolean existsByReferenceId(String referenceId);
 }

@@ -42,9 +42,18 @@ public class MarketItem {
     @Column
     private String referenceId; // External ID to prevent duplicate listings (e.g. preset ID)
 
+    @org.hibernate.annotations.Formula("(select count(r.id) from market_reviews r where r.market_item_id = {alias}.id)")
+    private int reviewCount;
+
+    @org.hibernate.annotations.Formula("(select coalesce(avg(r.rating), 0) from market_reviews r where r.market_item_id = {alias}.id)")
+    private Double averageRating;
+
+    @org.hibernate.annotations.Formula("(select count(t.id) from market_transactions t where t.item_id = {alias}.id)")
+    private int salesCount;
+
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
     private MarketItemStatus status = MarketItemStatus.ON_SALE;
 
     @CreatedDate
