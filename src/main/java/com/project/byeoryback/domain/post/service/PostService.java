@@ -21,6 +21,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
     private final AlbumService albumService;
+    // [추가됨] 커뮤니티 서비스 주입
+    private final com.project.byeoryback.domain.community.service.CommunityService communityService;
 
     // 1. 전체 조회 (최신순)
     public List<Post> getAllPosts() {
@@ -40,6 +42,7 @@ public class PostService {
                 .floatingImages(request.getFloatingImages())
                 .user(user)
                 .isFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false)
+                .isPublic(request.getIsPublic() != null ? request.getIsPublic() : true) // [체크] 빌더에 isPublic 추가 필요
                 .build();
 
         Post savedPost = postRepository.save(post);
@@ -56,7 +59,8 @@ public class PostService {
             }
             // Folder assignment logic can be added similarly if needed
         }
-
+        // [추가됨] 커뮤니티 데이터 동기화 (공개글이면 커뮤니티 생성)
+        communityService.syncPublicStatus(savedPost);
         return savedPost;
     }
 
@@ -74,16 +78,19 @@ public class PostService {
                 request.getFloatingTexts(),
                 request.getFloatingImages(),
                 request.getIsFavorite(),
-                request.getMode());
+                request.getMode(),
+                request.getIsPublic());
 
         hashtagService.processHashtags(post, request.getHashtags());
-
+        // [추가됨] 공개 여부 변경 체크 후 커뮤니티 생성/삭제
+        communityService.syncPublicStatus(post);
         return post;
     }
 
     // 4. 삭제
     @Transactional
     public void deletePost(Long id) {
+        communityService.deleteByPostId(id);
         postRepository.deleteById(id);
     }
 
