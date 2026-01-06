@@ -17,10 +17,6 @@ public class CommunityController {
      * 커뮤니티 글 상세 조회
      * (조회수 1 증가)
      */
-    /**
-     * 커뮤니티 글 상세 조회
-     * (조회수 1 증가)
-     */
     @GetMapping("/{postId}")
     public ResponseEntity<CommunityDto.Response> getCommunity(
             @PathVariable Long postId,
