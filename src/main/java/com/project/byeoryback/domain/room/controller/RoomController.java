@@ -48,6 +48,14 @@ public class RoomController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<RoomResponse> updateRoom(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody RoomRequest request) {
+        return ResponseEntity.ok(roomService.updateRoom(id, userDetails.getUser(), request));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getRoom(@PathVariable Long id) {
         return ResponseEntity.ok(roomService.getRoom(id));
@@ -77,6 +85,14 @@ public class RoomController {
             @PathVariable Long userId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         roomService.kickMember(id, userId, userDetails.getUser());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRoom(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        roomService.deleteRoom(id, userDetails.getUser());
         return ResponseEntity.ok().build();
     }
 }

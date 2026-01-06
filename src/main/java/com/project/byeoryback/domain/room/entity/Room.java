@@ -8,6 +8,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import java.util.Map;
 
 @Entity
 @Table(name = "rooms")
@@ -31,6 +34,10 @@ public class Room {
 
     private String coverImage;
 
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> coverConfig;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hashtag_id")
     private Hashtag hashtag;
@@ -51,5 +58,18 @@ public class Room {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void update(String name, String description, String password, String coverImage, Hashtag hashtag,
+            Map<String, Object> coverConfig) {
+        this.name = name;
+        this.description = description;
+        if (password != null)
+            this.password = password;
+        this.coverImage = coverImage;
+        this.hashtag = hashtag;
+        if (coverConfig != null) {
+            this.coverConfig = coverConfig;
+        }
     }
 }

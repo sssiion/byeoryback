@@ -48,6 +48,7 @@ public class RoomService {
                 .description(request.getDescription())
                 .password(encodedPassword)
                 .coverImage(request.getCoverImage())
+                .coverConfig(request.getCoverConfig())
                 .hashtag(hashtag)
                 .owner(user)
                 .build();
@@ -154,5 +155,42 @@ public class RoomService {
         }
 
         roomMemberRepository.delete(targetMember);
+    }
+
+    @Transactional
+    public void deleteRoom(Long roomId, User requester) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        if (!room.getOwner().getId().equals(requester.getId())) {
+            throw new IllegalArgumentException("Only the owner can delete the room");
+        }
+
+        roomRepository.delete(room);
+    }
+
+    @Transactional
+    public RoomResponse updateRoom(Long roomId, User requester, RoomRequest request) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        if (!room.getOwner().getId().equals(requester.getId())) {
+            throw new IllegalArgumentException("Only the owner can update the room");
+        }
+
+        Hashtag hashtag = null;
+        if (request.getTagName() != null && !request.getTagName().isEmpty()) {
+            hashtag = hashtagService.findOrCreate(request.getTagName());
+        }
+
+        String password = null;
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            password = passwordEncoder.encode(request.getPassword());
+        }
+
+        room.update(request.getName(), request.getDescription(), password, request.getCoverImage(), hashtag,
+                request.getCoverConfig());
+
+        return RoomResponse.from(room);
     }
 }

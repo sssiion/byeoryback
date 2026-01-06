@@ -18,6 +18,7 @@ public class RoomResponse {
     private Long ownerId;
     private String ownerName;
     private int memberCount;
+    private java.util.Map<String, Object> coverConfig;
     private LocalDateTime createdAt;
 
     public static RoomResponse from(Room room) {
@@ -31,6 +32,7 @@ public class RoomResponse {
                 .ownerId(room.getOwner().getId())
                 .ownerName(room.getOwner().getEmail()) // Use email for now
                 .memberCount(room.getMembers().size())
+                .coverConfig(room.getCoverConfig())
                 .createdAt(room.getCreatedAt())
                 .build();
     }

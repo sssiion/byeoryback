@@ -174,6 +174,7 @@ public class AlbumService {
                 .parent(parent)
                 .representativeHashtag(hashtag)
                 .isFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false)
+                .coverConfig(request.getCoverConfig())
                 .build();
 
         Album savedAlbum = albumRepository.save(album);
@@ -201,7 +202,7 @@ public class AlbumService {
             hashtag = hashtagService.findOrCreate(request.getTag());
         }
 
-        album.update(request.getName(), parent, hashtag, request.getIsFavorite());
+        album.update(request.getName(), parent, hashtag, request.getIsFavorite(), request.getCoverConfig());
 
         // Recalculate counts
         Long folderCount = getFolderCount(album.getId());

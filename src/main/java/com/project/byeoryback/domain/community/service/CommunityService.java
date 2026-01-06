@@ -1,7 +1,5 @@
 package com.project.byeoryback.domain.community.service;
 
-
-
 import com.project.byeoryback.domain.community.entity.Community;
 import com.project.byeoryback.domain.community.repository.CommunityRepository;
 import com.project.byeoryback.domain.post.entity.Post;
@@ -36,7 +34,7 @@ public class CommunityService {
     }
 
     private void createCommunity(Post post) {
-        Community community = community.builder()
+        Community community = Community.builder()
                 .post(post)
                 .user(post.getUser())
                 .likeCount(0L)

@@ -14,6 +14,7 @@ public class AlbumResponse {
     private String tag;
     private Long parentId;
     private Boolean isFavorite;
+    private java.util.Map<String, Object> coverConfig;
     private LocalDateTime createdAt;
 
     private Long folderCount;
@@ -26,6 +27,7 @@ public class AlbumResponse {
                 .tag(album.getRepresentativeHashtag() != null ? album.getRepresentativeHashtag().getName() : null)
                 .parentId(album.getParent() != null ? album.getParent().getId() : null)
                 .isFavorite(album.getIsFavorite())
+                .coverConfig(album.getCoverConfig())
                 .createdAt(album.getCreatedAt())
                 .folderCount(folderCount)
                 .postCount(postCount)

@@ -11,4 +11,5 @@ public class RoomRequest {
     private String password;
     private String coverImage;
     private String tagName;
+    private java.util.Map<String, Object> coverConfig;
 }

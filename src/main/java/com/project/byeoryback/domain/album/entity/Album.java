@@ -7,6 +7,10 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import java.util.Map;
+
 @Entity
 @Table(name = "albums")
 @Getter
@@ -38,6 +42,10 @@ public class Album {
     @Builder.Default
     private Boolean isFavorite = false;
 
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> coverConfig;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -54,12 +62,16 @@ public class Album {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String name, Album parent, Hashtag representativeHashtag, Boolean isFavorite) {
+    public void update(String name, Album parent, Hashtag representativeHashtag, Boolean isFavorite,
+            Map<String, Object> coverConfig) {
         this.name = name;
         this.parent = parent;
         this.representativeHashtag = representativeHashtag;
         if (isFavorite != null) {
             this.isFavorite = isFavorite;
+        }
+        if (coverConfig != null) {
+            this.coverConfig = coverConfig;
         }
     }
 }

@@ -10,4 +10,5 @@ public class AlbumRequest {
     private String tag; // Representative hashtag name
     private Long parentId;
     private Boolean isFavorite;
+    private java.util.Map<String, Object> coverConfig;
 }
