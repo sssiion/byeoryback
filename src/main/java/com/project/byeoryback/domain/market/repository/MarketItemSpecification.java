@@ -14,8 +14,11 @@ public class MarketItemSpecification {
 
     public static Specification<MarketItem> hasSellerId(Long sellerId) {
         return (root, query, criteriaBuilder) -> {
-            if (sellerId == 0L) {
+            if (sellerId != null && sellerId.equals(0L)) {
                 return criteriaBuilder.isNull(root.get("seller"));
+            }
+            if (sellerId == null) {
+                return null; // Or handle as "no filtering"
             }
             return criteriaBuilder.equal(root.get("seller").get("id"), sellerId);
         };
@@ -23,6 +26,9 @@ public class MarketItemSpecification {
 
     public static Specification<MarketItem> containsKeyword(String keyword) {
         return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return null;
+            }
             String likePattern = "%" + keyword + "%";
             return criteriaBuilder.or(
                     criteriaBuilder.like(root.get("name"), likePattern),
@@ -32,6 +38,9 @@ public class MarketItemSpecification {
 
     public static Specification<MarketItem> containsTags(List<String> tags) {
         return (root, query, criteriaBuilder) -> {
+            if (tags == null || tags.isEmpty()) {
+                return null;
+            }
             Specification<MarketItem> spec = Specification.where(null);
             for (String tag : tags) {
                 String likePattern = "%" + tag + "%";
