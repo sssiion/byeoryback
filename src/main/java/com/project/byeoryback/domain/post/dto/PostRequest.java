@@ -17,7 +17,7 @@ public class PostRequest {
     private List<FloatingItem> floatingTexts; // 프론트엔드 필드명과 일치해야 함
     private List<FloatingItem> floatingImages; // 프론트엔드 필드명과 일치해야 함
 
-    private List<String> hashtags;
+    private List<String> tags; // [Renamed] hashtags -> tags
     private String mode; // "AUTO", "MANUAL"
     private List<Long> targetAlbumIds;
     private List<Long> targetFolderIds;

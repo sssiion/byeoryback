@@ -19,10 +19,18 @@ public class PostController {
 
     private final PostService postService;
 
-    // 1. 목록 조회
+    // 1. 목록 조회 (로그인한 유저의 글만)
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
+    public ResponseEntity<List<PostResponse>> getMyPosts(
+            @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails) {
+        List<Post> posts;
+        if (userDetails != null) {
+            posts = postService.getPostsByUserId(userDetails.getUser().getId());
+        } else {
+            // 비로그인 시 빈 리스트 혹은 에러 처리 (여기선 빈 리스트)
+            posts = List.of();
+        }
+
         List<PostResponse> response = posts.stream()
                 .map(PostResponse::from)
                 .toList();

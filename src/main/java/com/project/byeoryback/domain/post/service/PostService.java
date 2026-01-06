@@ -29,6 +29,11 @@ public class PostService {
         return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
+    // [New] 특정 유저의 게시글만 조회
+    public List<Post> getPostsByUserId(Long userId) {
+        return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+    }
+
     // 2. 게시글 생성
     @Transactional
     public Post createPost(User user, PostRequest request) {
@@ -48,7 +53,7 @@ public class PostService {
         Post savedPost = postRepository.save(post);
 
         // Hashtag processing
-        hashtagService.processHashtags(savedPost, request.getHashtags());
+        hashtagService.processHashtags(savedPost, request.getTags());
 
         // Manual Album/Folder assignment
         if ("MANUAL".equalsIgnoreCase(request.getMode())) {
@@ -80,7 +85,7 @@ public class PostService {
                 request.getMode(),
                 request.getIsPublic());
 
-        hashtagService.processHashtags(post, request.getHashtags());
+        hashtagService.processHashtags(post, request.getTags());
 
         return post;
     }
