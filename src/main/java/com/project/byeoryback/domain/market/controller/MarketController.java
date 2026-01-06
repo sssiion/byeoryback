@@ -26,8 +26,9 @@ public class MarketController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long sellerId,
             @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Boolean isFree,
             Pageable pageable) {
-        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, sellerId, tags, pageable));
+        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, sellerId, tags, isFree, pageable));
     }
 
     @GetMapping("/my-items")
@@ -53,6 +54,16 @@ public class MarketController {
         if (userDetails == null)
             return ResponseEntity.status(401).build();
         return ResponseEntity.ok(marketService.registerItem(userDetails.getUser().getId(), request));
+    }
+
+    @PutMapping("/items/{itemId}")
+    public ResponseEntity<MarketItemResponse> updateItem(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long itemId,
+            @RequestBody MarketItemRequest request) {
+        if (userDetails == null)
+            return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(marketService.updateItem(userDetails.getUser().getId(), itemId, request));
     }
 
     @PostMapping("/buy/{itemId}")

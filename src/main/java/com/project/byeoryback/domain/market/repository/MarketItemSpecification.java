@@ -40,4 +40,8 @@ public class MarketItemSpecification {
             return spec.toPredicate(root, query, criteriaBuilder);
         };
     }
+
+    public static Specification<MarketItem> isFree() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("price"), 0L);
+    }
 }

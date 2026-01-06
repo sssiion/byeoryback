@@ -27,7 +27,7 @@ public class MarketService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Long sellerId, List<String> tags,
+    public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Long sellerId, List<String> tags, Boolean isFree,
             Pageable pageable) {
         org.springframework.data.jpa.domain.Specification<MarketItem> spec = org.springframework.data.jpa.domain.Specification
                 .where(com.project.byeoryback.domain.market.repository.MarketItemSpecification
@@ -45,6 +45,10 @@ public class MarketService {
 
         if (tags != null && !tags.isEmpty()) {
             spec = spec.and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.containsTags(tags));
+        }
+
+        if (Boolean.TRUE.equals(isFree)) {
+            spec = spec.and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.isFree());
         }
 
         Page<MarketItem> items = itemRepository.findAll(spec, pageable);
@@ -101,40 +105,53 @@ public class MarketService {
         MarketItem item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found"));
 
-        if (item.getStatus() == MarketItemStatus.CANCELLED) {
-            throw new IllegalStateException("Item sale is cancelled");
+        if (item.getStatus() != MarketItemStatus.ON_SALE) {
+            throw new IllegalStateException("Item is not on sale");
         }
 
         if (item.getSeller() != null && item.getSeller().getId().equals(userId)) {
-            throw new IllegalStateException("Cannot buy your own item");
+            throw new IllegalStateException("본인의 아이템은 구매할 수 없습니다.");
         }
 
-        // Check Credits
-        if (!buyer.spendCredits(item.getPrice())) {
-            throw new IllegalStateException("Not enough credits");
+        long price = item.getPrice();
+        if (buyer.getCredits() < price) {
+            throw new IllegalStateException("크레딧이 부족합니다.");
         }
 
-        // Process Transaction
+        // Transaction
+        buyer.spendCredits(price); // deduct
+        if (item.getSeller() != null) {
+            item.getSeller().addCredits(price); // add to seller
+        }
+
         MarketTransaction transaction = MarketTransaction.builder()
+                .item(item)
                 .buyer(buyer)
                 .seller(item.getSeller())
-                .item(item)
-                .price(item.getPrice())
+                .price(price)
+                .transactionDate(java.time.LocalDateTime.now())
                 .build();
 
         transactionRepository.save(transaction);
-        userRepository.save(buyer); // Update buyer credits
 
-        // If it's a User Seller (not System), transfer credits and mark sold
-        if (item.getSeller() != null) {
-            User seller = item.getSeller();
-            seller.addCredits(item.getPrice());
-            userRepository.save(seller); // Update seller credits
+        // Increase sales count (triggers trigger update usually, but here we can just
+        // rely on Formula or manual update if needed)
+        // Since we use @Formula, we don't need to manually update salesCount field
+        // unless we cache it.
+    }
 
-            // item.markAsSold(); // REMOVED: Items are digital goods (unlimited stock)
-        } else {
-            // System Item - Infinite Stock, Credits disappear (burned)
+    @Transactional
+    public MarketItemResponse updateItem(Long userId, Long itemId, MarketItemRequest request) {
+        MarketItem item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+
+        if (!item.getSeller().getId().equals(userId)) {
+            throw new IllegalStateException("본인의 아이템만 수정할 수 있습니다.");
         }
+
+        item.update(request.getName(), request.getPrice(), request.getContentJson(), request.getCategory());
+
+        return MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId()));
     }
 
     @Transactional

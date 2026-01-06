@@ -62,4 +62,15 @@ public class MarketItem {
     public void cancelSale() {
         this.status = MarketItemStatus.CANCELLED;
     }
+
+    public void update(String name, Long price, String contentJson, String category) {
+        if (name != null)
+            this.name = name;
+        if (price != null)
+            this.price = price;
+        if (contentJson != null)
+            this.contentJson = contentJson;
+        if (category != null)
+            this.category = category;
+    }
 }
