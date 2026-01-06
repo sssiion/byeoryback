@@ -27,14 +27,27 @@ public class MarketService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Pageable pageable) {
-        Page<MarketItem> items;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            items = itemRepository.findByNameContainingAndStatus(keyword, MarketItemStatus.ON_SALE, pageable);
-        } else {
-            items = itemRepository.findByStatus(MarketItemStatus.ON_SALE, pageable);
+    public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Long sellerId, List<String> tags,
+            Pageable pageable) {
+        org.springframework.data.jpa.domain.Specification<MarketItem> spec = org.springframework.data.jpa.domain.Specification
+                .where(com.project.byeoryback.domain.market.repository.MarketItemSpecification
+                        .hasStatus(MarketItemStatus.ON_SALE));
+
+        if (sellerId != null) {
+            spec = spec
+                    .and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.hasSellerId(sellerId));
         }
 
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            spec = spec.and(
+                    com.project.byeoryback.domain.market.repository.MarketItemSpecification.containsKeyword(keyword));
+        }
+
+        if (tags != null && !tags.isEmpty()) {
+            spec = spec.and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.containsTags(tags));
+        }
+
+        Page<MarketItem> items = itemRepository.findAll(spec, pageable);
         return items.map(item -> MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId())));
     }
 

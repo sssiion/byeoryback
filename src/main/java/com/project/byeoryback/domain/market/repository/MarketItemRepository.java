@@ -10,7 +10,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Repository
-public interface MarketItemRepository extends JpaRepository<MarketItem, Long> {
+public interface MarketItemRepository extends JpaRepository<MarketItem, Long>,
+        org.springframework.data.jpa.repository.JpaSpecificationExecutor<MarketItem> {
     List<MarketItem> findByStatusOrderByCreatedAtDesc(MarketItemStatus status);
 
     List<MarketItem> findBySellerIdAndStatus(Long sellerId, MarketItemStatus status);
@@ -24,4 +25,12 @@ public interface MarketItemRepository extends JpaRepository<MarketItem, Long> {
     boolean existsBySellerIdAndReferenceIdAndStatus(Long sellerId, String referenceId, MarketItemStatus status);
 
     boolean existsByReferenceId(String referenceId);
+
+    java.util.Optional<MarketItem> findByReferenceId(String referenceId);
+
+    Page<MarketItem> findBySellerIdAndStatus(Long sellerId, MarketItemStatus status, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query("SELECT m FROM MarketItem m WHERE m.status = :status AND (m.name LIKE %:keyword% OR m.contentJson LIKE %:keyword%)")
+    Page<MarketItem> searchByKeyword(@org.springframework.data.repository.query.Param("status") MarketItemStatus status,
+            @org.springframework.data.repository.query.Param("keyword") String keyword, Pageable pageable);
 }

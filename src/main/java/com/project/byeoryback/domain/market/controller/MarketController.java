@@ -24,8 +24,10 @@ public class MarketController {
     @GetMapping("/items")
     public ResponseEntity<Page<MarketItemResponse>> getAllOnSaleItems(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long sellerId,
+            @RequestParam(required = false) List<String> tags,
             Pageable pageable) {
-        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, pageable));
+        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, sellerId, tags, pageable));
     }
 
     @GetMapping("/my-items")
