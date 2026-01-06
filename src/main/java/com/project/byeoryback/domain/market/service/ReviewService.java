@@ -53,4 +53,16 @@ public class ReviewService {
                 .map(ReviewResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteReview(Long userId, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
+
+        if (!review.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Not authorized to delete this review");
+        }
+
+        reviewRepository.delete(review);
+    }
 }
