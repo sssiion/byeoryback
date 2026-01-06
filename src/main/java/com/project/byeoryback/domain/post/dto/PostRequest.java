@@ -22,4 +22,6 @@ public class PostRequest {
     private List<Long> targetAlbumIds;
     private List<Long> targetFolderIds;
     private Boolean isFavorite;
+    private Boolean isPublic;
+
 }

@@ -62,6 +62,11 @@ public class Post {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<FloatingItem> floatingImages;
 
+    // [추가됨] 공개 여부 (기본값 true 또는 false 설정)
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isPublic = true;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostHashtag> postHashtags = new java.util.ArrayList<>();
@@ -92,7 +97,7 @@ public class Post {
 
     public void update(String title, java.util.Map<String, Object> titleStyles, List<Block> blocks,
             List<FloatingItem> stickers,
-            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode) {
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode, Boolean isPublic) {
         this.title = title;
         this.titleStyles = titleStyles;
         this.blocks = blocks;
@@ -104,6 +109,7 @@ public class Post {
         }
         this.mode = mode;
         this.mode = mode;
+        if (isPublic != null) this.isPublic = isPublic;
     }
 
     public void clearPostHashtags() {
