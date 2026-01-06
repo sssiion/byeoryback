@@ -18,4 +18,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     void deleteByUserId(Long userId);
 
+    org.springframework.data.domain.Page<Post> findByIsPublicTrue(org.springframework.data.domain.Pageable pageable);
+
+    // [New] 해시태그로 공개 게시글 검색
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p " +
+            "JOIN p.postHashtags ph " +
+            "JOIN ph.hashtag h " +
+            "WHERE p.isPublic = true AND h.name = :hashtag")
+    org.springframework.data.domain.Page<Post> findByIsPublicTrueAndHashtag(
+            @org.springframework.web.bind.annotation.RequestParam("hashtag") String hashtag,
+            org.springframework.data.domain.Pageable pageable);
 }

@@ -21,11 +21,11 @@ public class CommunityController {
      * 커뮤니티 글 상세 조회
      * (조회수 1 증가)
      */
-    @GetMapping("/{communityId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<CommunityDto.Response> getCommunity(
-            @PathVariable Long communityId,
+            @PathVariable Long postId,
             @RequestParam(required = false) Long userId) {
-        return ResponseEntity.ok(communityService.getCommunity(communityId, userId));
+        return ResponseEntity.ok(communityService.getCommunity(postId, userId));
     }
 
     /**
@@ -35,19 +35,20 @@ public class CommunityController {
     @GetMapping
     public ResponseEntity<org.springframework.data.domain.Page<CommunityDto.Response>> getCommunityList(
             @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable,
-            @RequestParam(required = false) Long userId) {
-        return ResponseEntity.ok(communityService.getCommunityList(pageable, userId));
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String hashtag) { // [New] hashtag 파라미터 추가
+        return ResponseEntity.ok(communityService.getCommunityList(pageable, userId, hashtag));
     }
 
     /**
      * 좋아요 토글
      * POST /api/communities/{communityId}/like
      */
-    @PostMapping("/{communityId}/like")
+    @PostMapping("/{postId}/like")
     public ResponseEntity<Void> toggleLike(
-            @PathVariable Long communityId,
+            @PathVariable Long postId,
             @RequestParam Long userId) {
-        communityService.toggleLike(communityId, userId);
+        communityService.toggleLike(postId, userId);
         return ResponseEntity.ok().build();
     }
 

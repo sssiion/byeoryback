@@ -59,8 +59,7 @@ public class PostService {
             }
             // Folder assignment logic can be added similarly if needed
         }
-        // [추가됨] 커뮤니티 데이터 동기화 (공개글이면 커뮤니티 생성)
-        communityService.syncPublicStatus(savedPost);
+
         return savedPost;
     }
 
@@ -82,8 +81,7 @@ public class PostService {
                 request.getIsPublic());
 
         hashtagService.processHashtags(post, request.getHashtags());
-        // [추가됨] 공개 여부 변경 체크 후 커뮤니티 생성/삭제
-        communityService.syncPublicStatus(post);
+
         return post;
     }
 

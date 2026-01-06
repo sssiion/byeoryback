@@ -23,7 +23,7 @@ public class MessageDto {
     @Builder
     public static class Response {
         private Long messageId;
-        private Long communityId;
+        private Long postId; // communityId -> postId 변경
         private Long userId;
         private String nickname;
         private String content;
@@ -32,10 +32,11 @@ public class MessageDto {
         public static Response from(Message message) {
             return Response.builder()
                     .messageId(message.getId())
-                    .communityId(message.getCommunity().getId())
+                    .postId(message.getPost().getId())
                     .userId(message.getUser().getId())
                     .nickname(message.getUser().getUserProfile() != null
-                            ? message.getUser().getUserProfile().getNickname() : "Unknown")
+                            ? message.getUser().getUserProfile().getNickname()
+                            : "Unknown")
                     .content(message.getContent())
                     .createdAt(message.getCreatedAt())
                     .build();

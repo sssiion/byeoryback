@@ -1,6 +1,5 @@
 package com.project.byeoryback.domain.message.entity;
 
-import com.project.byeoryback.domain.community.entity.Community;
 import com.project.byeoryback.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,10 +22,10 @@ public class Message {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    // 어떤 커뮤니티 게시글의 댓글인지 연결
+    // 어떤 게시글의 댓글인지 연결
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "community_id", nullable = false)
-    private Community community;
+    @JoinColumn(name = "post_id", nullable = false)
+    private com.project.byeoryback.domain.post.entity.Post post;
 
     // 댓글 작성자
     @ManyToOne(fetch = FetchType.LAZY)

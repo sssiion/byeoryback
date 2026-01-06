@@ -20,12 +20,12 @@ public class MessageController {
         private final UserRepository userRepository;
 
         /**
-         * 댓글 목록 조회 (특정 커뮤니티 글의 댓글들)
-         * GET /api/communities/{communityId}/messages
+         * 댓글 목록 조회 (특정 게시글의 댓글들)
+         * GET /api/posts/{postId}/messages
          */
-        @GetMapping("/communities/{communityId}/messages")
-        public ResponseEntity<List<MessageDto.Response>> getMessages(@PathVariable Long communityId) {
-                List<MessageDto.Response> responses = messageService.getMessagesByCommunityId(communityId)
+        @GetMapping("/posts/{postId}/messages")
+        public ResponseEntity<List<MessageDto.Response>> getMessages(@PathVariable Long postId) {
+                List<MessageDto.Response> responses = messageService.getMessagesByPostId(postId)
                                 .stream()
                                 .map(MessageDto.Response::from)
                                 .collect(Collectors.toList());
@@ -34,11 +34,11 @@ public class MessageController {
 
         /**
          * 댓글 작성
-         * POST /api/communities/{communityId}/messages
+         * POST /api/posts/{postId}/messages
          */
-        @PostMapping("/communities/{communityId}/messages")
+        @PostMapping("/posts/{postId}/messages")
         public ResponseEntity<MessageDto.Response> createMessage(
-                        @PathVariable Long communityId,
+                        @PathVariable Long postId,
                         @RequestBody MessageDto.Request request,
                         @RequestParam Long userId // [TODO] 실제론 @AuthenticationPrincipal 등으로 교체 권장
         ) {
@@ -46,7 +46,7 @@ public class MessageController {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
-                var message = messageService.createMessage(user, communityId, request.getContent());
+                var message = messageService.createMessage(user, postId, request.getContent());
                 return ResponseEntity.ok(MessageDto.Response.from(message));
         }
 

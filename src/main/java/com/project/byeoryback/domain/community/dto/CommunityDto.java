@@ -1,10 +1,13 @@
 package com.project.byeoryback.domain.community.dto;
 
-import com.project.byeoryback.domain.community.entity.Community;
+import com.project.byeoryback.domain.post.entity.Block;
+import com.project.byeoryback.domain.post.entity.FloatingItem;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public class CommunityDto {
 
@@ -15,33 +18,45 @@ public class CommunityDto {
         private Long communityId;
         private Long postId;
         private String title;
+        private Map<String, Object> titleStyles; // [추가]
         private String writerNickname; // 작성자 닉네임
         private Long viewCount;
         private Long likeCount;
         private Boolean isPublic;
         private Boolean isLiked; // [추가] 좋아요 여부
         private LocalDateTime createdAt;
-        // 필요하다면 Post의 blocks, stickers 등 내용도 포함
 
-        public static Response from(Community community, boolean isLiked) {
+        // [추가] 상세 콘텐츠
+        private List<Block> blocks;
+        private List<FloatingItem> stickers;
+        private List<FloatingItem> floatingTexts;
+        private List<FloatingItem> floatingImages;
+        private List<String> hashtags; // [추가] 해시태그 목록
+
+        public static Response from(com.project.byeoryback.domain.post.entity.Post post,
+                com.project.byeoryback.domain.post.entity.PostStat postStat,
+                boolean isLiked) {
             return Response.builder()
-                    .communityId(community.getId())
-                    .postId(community.getPost().getId())
-                    .title(community.getPost().getTitle())
-                    .writerNickname(community.getUser().getUserProfile() != null
-                            ? community.getUser().getUserProfile().getNickname()
-                            : "Unknown") // 프로필 null 체크
-                    .viewCount(community.getViewCount())
-                    .likeCount(community.getLikeCount())
-                    .isPublic(community.getPost().getIsPublic())
-                    .isLiked(isLiked) // [추가]
-                    .createdAt(community.getCreatedAt())
+                    .communityId(post.getId()) // communityId는 이제 postId와 동일
+                    .postId(post.getId())
+                    .title(post.getTitle())
+                    .titleStyles(post.getTitleStyles())
+                    .writerNickname(post.getUser().getUserProfile() != null
+                            ? post.getUser().getUserProfile().getNickname()
+                            : "Unknown")
+                    .viewCount(postStat != null ? postStat.getViewCount() : 0L)
+                    .likeCount(postStat != null ? postStat.getLikeCount() : 0L)
+                    .isPublic(post.getIsPublic())
+                    .isLiked(isLiked)
+                    .createdAt(post.getCreatedAt())
+                    .blocks(post.getBlocks())
+                    .stickers(post.getStickers())
+                    .floatingTexts(post.getFloatingTexts())
+                    .floatingImages(post.getFloatingImages())
+                    .hashtags(post.getPostHashtags().stream()
+                            .map(ph -> ph.getHashtag().getName())
+                            .collect(java.util.stream.Collectors.toList()))
                     .build();
-        }
-
-        // 기존 코드 호환용 (isLiked 없이 호출 시 false 처리)
-        public static Response from(Community community) {
-            return from(community, false);
         }
     }
 }

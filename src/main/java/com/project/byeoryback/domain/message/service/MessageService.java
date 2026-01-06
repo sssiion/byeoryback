@@ -1,8 +1,5 @@
 package com.project.byeoryback.domain.message.service;
 
-
-import com.project.byeoryback.domain.community.entity.Community;
-import com.project.byeoryback.domain.community.repository.CommunityRepository;
 import com.project.byeoryback.domain.message.entity.Message;
 import com.project.byeoryback.domain.message.repository.MessageRepository;
 import com.project.byeoryback.domain.user.entity.User;
@@ -17,16 +14,16 @@ import java.util.List;
 public class MessageService {
 
     private final MessageRepository messageRepository;
-    private final CommunityRepository communityRepository;
+    private final com.project.byeoryback.domain.post.repository.PostRepository postRepository;
 
     // 1. 댓글 생성
     @Transactional
-    public Message createMessage(User user, Long communityId, String content) {
-        Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 커뮤니티 글이 없습니다."));
+    public Message createMessage(User user, Long postId, String content) {
+        com.project.byeoryback.domain.post.entity.Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
 
         Message message = Message.builder()
-                .community(community)
+                .post(post)
                 .user(user)
                 .content(content)
                 .build();
@@ -61,8 +58,8 @@ public class MessageService {
         messageRepository.delete(message);
     }
 
-    // 4. 특정 커뮤니티 글의 댓글 목록 조회
-    public List<Message> getMessagesByCommunityId(Long communityId) {
-        return messageRepository.findByCommunityIdOrderByCreatedAtAsc(communityId);
+    // 4. 특정 게시글의 댓글 목록 조회
+    public List<Message> getMessagesByPostId(Long postId) {
+        return messageRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
 }
