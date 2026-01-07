@@ -28,6 +28,7 @@ public class MarketService {
 
     @Transactional(readOnly = true)
     public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Long sellerId, List<String> tags, Boolean isFree,
+            String category,
             Pageable pageable) {
         org.springframework.data.jpa.domain.Specification<MarketItem> spec = org.springframework.data.jpa.domain.Specification
                 .where(com.project.byeoryback.domain.market.repository.MarketItemSpecification
@@ -51,6 +52,11 @@ public class MarketService {
             spec = spec.and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.isFree());
         }
 
+        if (category != null && !category.trim().isEmpty() && !category.equals("all")) {
+            spec = spec
+                    .and(com.project.byeoryback.domain.market.repository.MarketItemSpecification.hasCategory(category));
+        }
+
         Page<MarketItem> items = itemRepository.findAll(spec, pageable);
         return items.map(item -> MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId())));
     }
@@ -70,6 +76,13 @@ public class MarketService {
                 .map(t -> MarketItemResponse.from(t.getItem(),
                         transactionRepository.countByItemId(t.getItem().getId())))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public MarketItemResponse getMarketItem(Long itemId) {
+        MarketItem item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+        return MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId()));
     }
 
     @Transactional
@@ -134,10 +147,58 @@ public class MarketService {
 
         transactionRepository.save(transaction);
 
-        // Increase sales count (triggers trigger update usually, but here we can just
-        // rely on Formula or manual update if needed)
+        // on Formula or manual update if needed)
         // Since we use @Formula, we don't need to manually update salesCount field
         // unless we cache it.
+    }
+
+    @Transactional
+    public void buyItemByReferenceId(Long userId, String referenceId) {
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        MarketItem item = itemRepository.findByReferenceId(referenceId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+
+        if (item.getStatus() != MarketItemStatus.ON_SALE) {
+            throw new IllegalStateException("Item is not on sale");
+        }
+
+        if (item.getSeller() != null && item.getSeller().getId().equals(userId)) {
+            // Self-purchase check might be skipped for system items if seller is null?
+            // But here seller is likely not null.
+            throw new IllegalStateException("본인의 아이템은 구매할 수 없습니다.");
+        }
+
+        // Check if already purchased
+        if (transactionRepository.existsByBuyerIdAndItemId(userId, item.getId())) {
+            // Depending on logic, maybe allow multiple? But stickers usually once.
+            // For now, let's treat it as idempotent or throw.
+            // Given the user complaint "purchase not unlocking", maybe they rebuy?
+            // Let's safe guard.
+            return; // Already owned, just return success.
+        }
+
+        long price = item.getPrice();
+        if (buyer.getCredits() < price) {
+            throw new IllegalStateException("크레딧이 부족합니다.");
+        }
+
+        // Transaction
+        buyer.spendCredits(price); // deduct
+        if (item.getSeller() != null) {
+            item.getSeller().addCredits(price); // add to seller
+        }
+
+        MarketTransaction transaction = MarketTransaction.builder()
+                .item(item)
+                .buyer(buyer)
+                .seller(item.getSeller())
+                .price(price)
+                .transactionDate(java.time.LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(transaction);
     }
 
     @Transactional

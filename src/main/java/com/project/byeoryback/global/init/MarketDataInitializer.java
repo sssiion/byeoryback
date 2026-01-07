@@ -32,7 +32,7 @@ public class MarketDataInitializer {
                         List<Map<String, Object>> initialItems = Arrays.asList(
                                         Map.of(
                                                         "referenceId", "pack_basic",
-                                                        "category", "sticker",
+                                                        "category", "start_pack",
                                                         "name", "⭐ 스타터 팩",
                                                         "description", "다이어리 꾸미기의 기본! 필수 스티커 10종 모음.",
                                                         "price", 500L,
@@ -83,7 +83,48 @@ public class MarketDataInitializer {
                                                         "price", 1800L,
                                                         "tags", Arrays.asList("픽셀", "레트로", "이모지"),
                                                         "imageUrl",
-                                                        "https://cdn-icons-png.flaticon.com/512/10603/10603762.png"));
+                                                        "https://cdn-icons-png.flaticon.com/512/10603/10603762.png"),
+                                        // Individual Stickers (For Consolidated Purchase)
+                                        Map.of("referenceId", "cat_1", "category", "sticker", "name", "고양이 스티커 1",
+                                                        "description", "귀여운 고양이 스티커 (낱개)", "price", 200L, "tags",
+                                                        Arrays.asList("고양이", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/616/616408.png"),
+                                        Map.of("referenceId", "cat_2", "category", "sticker", "name", "고양이 스티커 2",
+                                                        "description", "귀여운 고양이 스티커 (낱개)", "price", 200L, "tags",
+                                                        Arrays.asList("고양이", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/616/616430.png"),
+                                        Map.of("referenceId", "vintage_1", "category", "sticker", "name", "빈티지 라벨 1",
+                                                        "description", "빈티지 라벨 스티커 (낱개)", "price", 300L, "tags",
+                                                        Arrays.asList("빈티지", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/2361/2361730.png"),
+                                        Map.of("referenceId", "pixel_1", "category", "sticker", "name", "픽셀 이모지 1",
+                                                        "description", "픽셀 아트 이모지 (낱개)", "price", 250L, "tags",
+                                                        Arrays.asList("픽셀", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/10603/10603762.png"),
+                                        Map.of("referenceId", "free_5", "category", "sticker", "name", "스마일",
+                                                        "description", "기본 스마일 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/742/742751.png"),
+                                        Map.of("referenceId", "free_6", "category", "sticker", "name", "해",
+                                                        "description", "기본 해 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/169/169367.png"),
+                                        Map.of("referenceId", "free_7", "category", "sticker", "name", "구름",
+                                                        "description", "기본 구름 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/414/414825.png"),
+                                        Map.of("referenceId", "free_8", "category", "sticker", "name", "음표",
+                                                        "description", "기본 음표 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/651/651717.png"),
+                                        Map.of("referenceId", "free_9", "category", "sticker", "name", "체크",
+                                                        "description", "기본 체크 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/190/190411.png"),
+                                        Map.of("referenceId", "free_10", "category", "sticker", "name", "엄지척",
+                                                        "description", "기본 엄지척 스티커", "price", 150L, "tags",
+                                                        Arrays.asList("기본", "낱개"), "imageUrl",
+                                                        "https://cdn-icons-png.flaticon.com/512/126/126473.png"));
 
                         for (Map<String, Object> data : initialItems) {
                                 String referenceId = (String) data.get("referenceId");
@@ -114,8 +155,9 @@ public class MarketDataInitializer {
 
                                 if (item != null) {
                                         item.setContentJson(contentJson);
-                                        item.setName((String) data.get("name")); // Also update name in case translation
-                                                                                 // changed
+                                        item.setName((String) data.get("name"));
+                                        item.setCategory((String) data.get("category"));
+                                        item.setPrice((Long) data.get("price"));
                                         marketItemRepository.save(item);
                                 }
                         }

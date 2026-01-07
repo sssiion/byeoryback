@@ -53,4 +53,13 @@ public class MarketItemSpecification {
     public static Specification<MarketItem> isFree() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("price"), 0L);
     }
+
+    public static Specification<MarketItem> hasCategory(String category) {
+        return (root, query, criteriaBuilder) -> {
+            if (category == null || category.trim().isEmpty()) {
+                return null;
+            }
+            return criteriaBuilder.equal(root.get("category"), category);
+        };
+    }
 }

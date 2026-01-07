@@ -13,4 +13,6 @@ public interface MarketTransactionRepository extends JpaRepository<MarketTransac
     List<MarketTransaction> findBySellerIdOrderByTransactionDateDesc(Long sellerId);
 
     long countByItemId(Long itemId);
+
+    boolean existsByBuyerIdAndItemId(Long buyerId, Long itemId);
 }

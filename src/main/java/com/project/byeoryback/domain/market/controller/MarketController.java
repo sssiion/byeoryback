@@ -27,8 +27,14 @@ public class MarketController {
             @RequestParam(required = false) Long sellerId,
             @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) Boolean isFree,
+            @RequestParam(required = false) String category,
             Pageable pageable) {
-        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, sellerId, tags, isFree, pageable));
+        return ResponseEntity.ok(marketService.getAllOnSaleItems(keyword, sellerId, tags, isFree, category, pageable));
+    }
+
+    @GetMapping("/items/{itemId}")
+    public ResponseEntity<MarketItemResponse> getMarketItem(@PathVariable Long itemId) {
+        return ResponseEntity.ok(marketService.getMarketItem(itemId));
     }
 
     @GetMapping("/my-items")
@@ -74,6 +80,20 @@ public class MarketController {
             return ResponseEntity.status(401).build();
         try {
             marketService.buyItem(userDetails.getUser().getId(), itemId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/buy/ref/{referenceId}")
+    public ResponseEntity<Void> buyItemByRef(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable String referenceId) {
+        if (userDetails == null)
+            return ResponseEntity.status(401).build();
+        try {
+            marketService.buyItemByReferenceId(userDetails.getUser().getId(), referenceId);
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().build();
