@@ -7,6 +7,8 @@ import com.project.byeoryback.domain.user.entity.User;
 import com.project.byeoryback.domain.hashtag.service.HashtagService;
 import com.project.byeoryback.domain.album.service.AlbumService;
 import com.project.byeoryback.domain.album.entity.AlbumContent;
+import com.project.byeoryback.domain.album.entity.Album;
+import com.project.byeoryback.domain.album.repository.AlbumRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -21,6 +23,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
     private final AlbumService albumService;
+    private final AlbumRepository albumRepository;
     // [추가됨] 커뮤니티 서비스 주입
     private final com.project.byeoryback.domain.community.service.CommunityService communityService;
 
@@ -55,15 +58,15 @@ public class PostService {
         // Hashtag processing
         hashtagService.processHashtags(savedPost, request.getTags());
 
-        // Manual Album/Folder assignment
-        if ("MANUAL".equalsIgnoreCase(request.getMode())) {
-            if (request.getTargetAlbumIds() != null) {
-                for (Long albumId : request.getTargetAlbumIds()) {
-                    albumService.addContentToAlbum(albumId, savedPost.getId(), AlbumContent.ContentType.POST);
-                }
+        // Album assignment: Always trust Frontend's explicit IDs.
+        // Frontend calculates proper album IDs for both MANUAL and AUTO modes.
+        // Backend purely persists these associations without hidden auto-logic.
+        if (request.getTargetAlbumIds() != null && !request.getTargetAlbumIds().isEmpty()) {
+            for (Long albumId : request.getTargetAlbumIds()) {
+                albumService.addContentToAlbum(albumId, savedPost.getId(), AlbumContent.ContentType.POST);
             }
-            // Folder assignment logic can be added similarly if needed
         }
+        // Folder assignment logic can be added similarly if needed
 
         return savedPost;
     }
@@ -86,6 +89,24 @@ public class PostService {
                 request.getIsPublic());
 
         hashtagService.processHashtags(post, request.getTags());
+
+        // [수정됨] 앨범 연결 관계 재설정 (Replace Logic)
+        // 1. 기존의 모든 앨범 연결 제거
+        post.getAlbumContents().clear();
+
+        // 2. 새 앨범 목록 연결
+        if (request.getTargetAlbumIds() != null && !request.getTargetAlbumIds().isEmpty()) {
+            List<Album> targetAlbums = albumRepository.findAllById(request.getTargetAlbumIds());
+
+            for (Album album : targetAlbums) {
+                AlbumContent content = AlbumContent.builder()
+                        .parentAlbum(album)
+                        .childPost(post)
+                        .contentType(AlbumContent.ContentType.POST)
+                        .build();
+                post.getAlbumContents().add(content);
+            }
+        }
 
         return post;
     }
