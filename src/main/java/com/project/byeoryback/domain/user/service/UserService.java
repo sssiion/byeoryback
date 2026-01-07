@@ -14,6 +14,12 @@ import com.project.byeoryback.domain.todo.repository.TodoRepository;
 import com.project.byeoryback.domain.setting.page.repository.PageSettingRepository;
 import com.project.byeoryback.domain.setting.theme.repository.ThemeSettingRepository;
 import com.project.byeoryback.domain.setting.menu.repository.MenuSettingRepository;
+import com.project.byeoryback.domain.album.repository.AlbumRepository;
+import com.project.byeoryback.domain.room.repository.RoomRepository;
+import com.project.byeoryback.domain.room.repository.RoomMemberRepository;
+import com.project.byeoryback.domain.market.repository.MarketTransactionRepository;
+import com.project.byeoryback.domain.market.repository.WishlistRepository;
+import com.project.byeoryback.domain.market.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +35,10 @@ public class UserService {
         private final PageSettingRepository pageSettingRepository;
         private final ThemeSettingRepository themeSettingRepository;
         private final MenuSettingRepository menuSettingRepository;
+
+        private final AlbumRepository albumRepository;
+        private final RoomRepository roomRepository;
+        private final RoomMemberRepository roomMemberRepository;
 
         @Transactional(readOnly = true)
         public UserProfileResponse getUserProfile(Long userId) {
@@ -106,24 +116,40 @@ public class UserService {
                                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
                 // 1. Delete User Profile
-                // Note: If UserProfile has cascade delete on User, this might be optional,
-                // but checking entity definition usually it's cleaner to delete children first
-                // or rely on constraints.
-                // Assuming explicit deletion for safety/clarity.
-                userProfileRepository.findByUserId(userId).ifPresent(userProfileRepository::delete);
+                // Handled by CascadeType.ALL on User entity
+                // userProfileRepository.findByUserId(userId).ifPresent(userProfileRepository::delete);
 
                 // 2. Delete Posts
-                postRepository.deleteByUserId(userId);
+                // Use deleteAll(entities) to trigger JPA cascades (Post -> PostStat, PostLike,
+                // etc.)
+                // deleteByUserId (raw delete) causes Foreign Key Constraint violations.
+                java.util.List<com.project.byeoryback.domain.post.entity.Post> posts = postRepository
+                                .findAllByUserIdOrderByCreatedAtDesc(userId);
+                postRepository.deleteAll(posts);
 
                 // 3. Delete Todos
-                todoRepository.deleteByUser(user);
+                // Handled by CascadeType.ALL on User entity
 
                 // 4. Delete Settings
                 pageSettingRepository.deleteByUserId(userId);
                 themeSettingRepository.deleteByUserId(userId);
                 menuSettingRepository.deleteByUserId(userId);
 
-                // 5. Delete User
+                // 5. Delete Albums and Folders
+                albumRepository.deleteAll(albumRepository.findAllByUserId(userId));
+
+                // 6. Delete Rooms (Owner) and Memberships
+                // Policy: Delete rooms owned by the user (Cascades to members and posts within
+                // the room)
+                roomRepository.deleteAll(roomRepository.findAllByOwnerId(userId));
+                // Remove user from other rooms they are a member of
+                roomMemberRepository.deleteAll(roomMemberRepository.findAllByUserId(userId));
+
+                // 7. Delete Market Data (Purchase History, Wishlist, Reviews)
+                // MarketTransaction and Review and Wishlist are handled by CascadeType.ALL on
+                // User entity
+
+                // 8. Delete User
                 userRepository.delete(user);
         }
 

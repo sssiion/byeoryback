@@ -8,8 +8,11 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.project.byeoryback.domain.post.entity.PostStat;
+import com.project.byeoryback.domain.post.entity.PostLike;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "posts")
@@ -71,9 +74,20 @@ public class Post {
     @Builder.Default
     private List<PostHashtag> postHashtags = new java.util.ArrayList<>();
 
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PostStat postStat;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostLike> likes = new ArrayList<>();
+
     @OneToMany(mappedBy = "childPost", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<AlbumContent> albumContents = new java.util.ArrayList<>();
+    private List<AlbumContent> albumContents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<com.project.byeoryback.domain.message.entity.Message> messages = new ArrayList<>();
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -97,7 +111,8 @@ public class Post {
 
     public void update(String title, java.util.Map<String, Object> titleStyles, List<Block> blocks,
             List<FloatingItem> stickers,
-            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode, Boolean isPublic) {
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode,
+            Boolean isPublic) {
         this.title = title;
         this.titleStyles = titleStyles;
         this.blocks = blocks;
@@ -109,7 +124,8 @@ public class Post {
         }
         this.mode = mode;
         this.mode = mode;
-        if (isPublic != null) this.isPublic = isPublic;
+        if (isPublic != null)
+            this.isPublic = isPublic;
     }
 
     public void clearPostHashtags() {

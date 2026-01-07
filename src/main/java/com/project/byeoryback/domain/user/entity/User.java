@@ -19,8 +19,60 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile userProfile;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private com.project.byeoryback.domain.persona.entity.Persona persona;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.post.entity.PostLike> likes = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.market.entity.Review> reviews = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.market.entity.MarketTransaction> purchases = new java.util.ArrayList<>();
+
+    // Seller transactions might be tricky if we want to keep history, but for
+    // complete deletion:
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.market.entity.MarketTransaction> sales = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.message.entity.Message> messages = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.todo.entity.Todo> todos = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.market.entity.Wishlist> wishlists = new java.util.ArrayList<>();
+
+    // 🌟 1. Market Listings (Items sold by user)
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.market.entity.MarketItem> marketListings = new java.util.ArrayList<>();
+
+    // 🌟 2. Widgets created by user
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.widget.entity.Widget> widgets = new java.util.ArrayList<>();
+
+    // 🌟 3. Room Cycle Memberships (User's participation in cycles)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<com.project.byeoryback.domain.room.entity.RoomCycleMember> cycleMemberships = new java.util.ArrayList<>();
+
+    // 🌟 4. Pin (Security/Lock)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private com.project.byeoryback.domain.pin.entity.Pin pin;
 
     @Column(nullable = false, unique = true)
     private String email;
