@@ -26,6 +26,7 @@ public class RoomCycleService {
     private final RoomCycleMemberRepository roomCycleMemberRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final com.project.byeoryback.domain.user.repository.UserProfileRepository userProfileRepository;
     private final com.project.byeoryback.domain.post.service.PostService postService;
     private final com.project.byeoryback.domain.post.repository.PostRepository postRepository;
 
@@ -73,19 +74,19 @@ public class RoomCycleService {
         // With CascadeType.ALL in RoomCycle, saving cycle should save members
         // effectively if added to list.
 
-        return RoomCycleResponse.from(cycle, requester.getId());
+        return RoomCycleResponse.from(cycle, requester.getId(), getNicknamesMap(cycle.getMembers()));
     }
 
     public List<RoomCycleResponse> getRoomCycles(Long roomId, User requester) {
         return roomCycleRepository.findAllByRoomId(roomId).stream()
-                .map(cycle -> RoomCycleResponse.from(cycle, requester.getId()))
+                .map(cycle -> RoomCycleResponse.from(cycle, requester.getId(), getNicknamesMap(cycle.getMembers())))
                 .toList();
     }
 
     public RoomCycleResponse getCycle(Long cycleId, User requester) {
         RoomCycle cycle = roomCycleRepository.findById(cycleId)
                 .orElseThrow(() -> new IllegalArgumentException("Cycle not found"));
-        return RoomCycleResponse.from(cycle, requester.getId());
+        return RoomCycleResponse.from(cycle, requester.getId(), getNicknamesMap(cycle.getMembers()));
     }
 
     @Transactional
@@ -112,23 +113,8 @@ public class RoomCycleService {
         boolean hasNext = cycle.getMembers().stream().anyMatch(m -> m.getTurnOrder() == nextOrder);
 
         if (hasNext) {
-            // Calculate next deadline if needed (for Diary)
-            // Re-use logic or config?
-            // For now, let's just say 24h by default if not strictly passed from previous.
-            // Or simpler: if nextTurnTime was set, add same duration?
-            // The request had TimeLimitHours. We might need to store that in Cycle if we
-            // want to refresh it.
-            // For prototype, we just update order.
-            LocalDateTime nextTime = cycle.getNextTurnTime(); // Current deadline logic placeholder
+            LocalDateTime nextTime = cycle.getNextTurnTime();
             if (nextTime != null) {
-                // Reset timer for next person? Logic wasn't fully specified, assuming 24h add
-                // or just keep moving
-                // Let's assume we want to reset the timer from NOW.
-                // But we didn't store the "Duration" in entity, only absolute time.
-                // Refactor opportunity: Add duration to RoomCycle entity if we want strict
-                // reset.
-                // For now, let's just proceed.
-                // Assuming 24h extension for now as per previous logic placeholder
                 cycle.nextTurn(LocalDateTime.now().plusHours(24));
             } else {
                 cycle.nextTurn(null);
@@ -138,7 +124,17 @@ public class RoomCycleService {
         }
 
         // Return updated state
-        return RoomCycleResponse.from(cycle, requester.getId());
+        return RoomCycleResponse.from(cycle, requester.getId(), getNicknamesMap(cycle.getMembers()));
+    }
+
+    private java.util.Map<Long, String> getNicknamesMap(List<RoomCycleMember> members) {
+        if (members == null)
+            return java.util.Collections.emptyMap();
+        List<Long> userIds = members.stream().map(m -> m.getUser().getId()).toList();
+        return userProfileRepository.findAllByUserIdIn(userIds).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        p -> p.getUser().getId(),
+                        p -> p.getNickname()));
     }
 
     @Transactional

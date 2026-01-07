@@ -23,7 +23,7 @@ public class RoomCycleResponse {
     private Long postId;
     private List<MemberDto> members;
 
-    public static RoomCycleResponse from(RoomCycle cycle, Long currentUserId) {
+    public static RoomCycleResponse from(RoomCycle cycle, Long currentUserId, java.util.Map<Long, String> nicknames) {
         boolean isMyTurn = false;
         // Check if it's my turn
         if (cycle.getStatus() == RoomCycle.CycleStatus.IN_PROGRESS && cycle.getMembers() != null) {
@@ -43,7 +43,10 @@ public class RoomCycleResponse {
                 .isMyTurn(isMyTurn)
                 .totalMembers(cycle.getMembers() != null ? cycle.getMembers().size() : 0)
                 .postId(cycle.getPostId())
-                .members(cycle.getMembers() != null ? cycle.getMembers().stream().map(MemberDto::from).toList()
+                .members(cycle.getMembers() != null ? cycle.getMembers().stream()
+                        .map(m -> MemberDto.from(m,
+                                nicknames.getOrDefault(m.getUser().getId(), m.getUser().getEmail().split("@")[0])))
+                        .toList()
                         : List.of())
                 .build();
     }
@@ -57,12 +60,10 @@ public class RoomCycleResponse {
         private Integer order;
         private boolean isCompleted;
 
-        public static MemberDto from(RoomCycleMember member) {
+        public static MemberDto from(RoomCycleMember member, String nickname) {
             return MemberDto.builder()
                     .userId(member.getUser().getId())
-                    // Nickname handling might need refinement depending on where we fetch it.
-                    // For now, using email prefix or checking if user has profile loaded
-                    .nickname(member.getUser().getEmail().split("@")[0])
+                    .nickname(nickname)
                     .email(member.getUser().getEmail())
                     .order(member.getTurnOrder())
                     .isCompleted(member.isCompleted())
