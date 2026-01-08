@@ -104,7 +104,9 @@ public class PersonaService {
                 "2. All JSON values (descriptions, keywords, mood names, word cloud text) MUST be in KOREAN (한국어).\n" +
                 "\n" +
                 "JSON Schema & Example (Values must be in Korean):\n" +
-                "{\n" +
+                "{{\n" +
+                "  \"representativeEmoji\": \"🐱\", (Select ONE emoji that best represents the user's overall vibe. e.g. 🐱, 🌿, ☕, 📚, 🎸)\n" +
+                "\n" +
                 "  \"digitalSelf\": [\n" +
                 "    \"당신은 일상의 작은 순간들 속에서 평화를 찾습니다\", \n" +
                 "    \"가까운 사람들과의 깊은 유대감을 중요하게 생각합니다\", \n" +
