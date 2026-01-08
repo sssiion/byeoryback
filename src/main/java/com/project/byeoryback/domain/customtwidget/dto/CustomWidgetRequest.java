@@ -1,4 +1,4 @@
-package com.project.byeoryback.domain.widget.dto;
+package com.project.byeoryback.domain.customtwidget.dto;
 
 
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
-public class WidgetRequest {
+public class CustomWidgetRequest {
     private String name;
     private String type;
     private String defaultSize; // 🌟 [NEW] 사이즈 필드 추가 (2x2, 4x2 등)

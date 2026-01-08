@@ -1,5 +1,6 @@
 package com.project.byeoryback.domain.user.entity;
 
+import com.project.byeoryback.domain.customtwidget.entity.CustomWidget;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -63,7 +64,7 @@ public class User {
     // 🌟 2. Widgets created by user
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private java.util.List<com.project.byeoryback.domain.widget.entity.Widget> widgets = new java.util.ArrayList<>();
+    private java.util.List<CustomWidget> customWidgets = new java.util.ArrayList<>();
 
     // 🌟 3. Room Cycle Memberships (User's participation in cycles)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
