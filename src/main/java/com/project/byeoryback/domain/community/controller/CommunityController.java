@@ -23,6 +23,18 @@ public class CommunityController {
             @RequestParam(required = false) Long userId) {
         return ResponseEntity.ok(communityService.getCommunity(postId, userId));
     }
+    @GetMapping("/card/{postId}")
+    public ResponseEntity<CommunityDto.Response> getCommunityForCard(
+            @PathVariable Long postId,
+            @RequestParam(required = false) Long userId) {
+        return ResponseEntity.ok(communityService.getCommunityForCard(postId, userId));
+    }
+    @GetMapping("/scroll/{postId}")
+    public ResponseEntity<CommunityDto.Response> increaseViewCount(
+            @PathVariable Long postId){
+        communityService.increaseViewCount(postId);
+        return ResponseEntity.ok().build();
+    }
 
     /**
      * 커뮤니티 글 목록 조회 (페이징)
