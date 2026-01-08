@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["jdk21_headless"]
+
+[phases.build]
+cmds = ["chmod +x gradlew", "./gradlew clean build -x test"]
+
+[start]
+cmd = "java -jar build/libs/byeoryback-0.0.1-SNAPSHOT.jar"
