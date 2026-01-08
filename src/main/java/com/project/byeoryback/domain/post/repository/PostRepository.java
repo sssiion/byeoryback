@@ -31,4 +31,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         org.springframework.data.domain.Page<Post> findByIsPublicTrueAndHashtag(
                         @Param("hashtag") String hashtag,
                         org.springframework.data.domain.Pageable pageable);
+
+        // [New] 기간별(월별) 내 게시글 조회
+        List<Post> findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(Long userId, java.time.LocalDateTime start,
+                        java.time.LocalDateTime end);
 }
