@@ -19,6 +19,7 @@ public class CommunityDto {
                 private Long postId;
                 private String title;
                 private Map<String, Object> titleStyles; // [추가]
+                private Map<String, Object> styles; // [Added] Paper Styles
                 private String writerNickname; // 작성자 닉네임
                 private Long viewCount;
                 private Long likeCount;
@@ -41,6 +42,7 @@ public class CommunityDto {
                                         .postId(post.getId())
                                         .title(post.getTitle())
                                         .titleStyles(post.getTitleStyles())
+                                        .styles(post.getStyles())
                                         .writerNickname(post.getUser().getUserProfile() != null
                                                         ? post.getUser().getUserProfile().getNickname()
                                                         : "Unknown")

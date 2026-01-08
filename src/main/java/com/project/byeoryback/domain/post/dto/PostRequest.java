@@ -12,6 +12,7 @@ import java.util.List;
 public class PostRequest {
     private String title;
     private java.util.Map<String, Object> titleStyles;
+    private java.util.Map<String, Object> styles; // [Added] Paper styles
     private List<Block> blocks;
     private List<FloatingItem> stickers;
     private List<FloatingItem> floatingTexts; // 프론트엔드 필드명과 일치해야 함

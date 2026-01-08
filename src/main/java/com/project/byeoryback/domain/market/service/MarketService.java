@@ -25,6 +25,7 @@ public class MarketService {
     private final MarketItemRepository itemRepository;
     private final MarketTransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final com.project.byeoryback.domain.post.repository.PostTemplateRepository postTemplateRepository;
 
     @Transactional(readOnly = true)
     public Page<MarketItemResponse> getAllOnSaleItems(String keyword, Long sellerId, List<String> tags, Boolean isFree,
@@ -126,6 +127,10 @@ public class MarketService {
             throw new IllegalStateException("본인의 아이템은 구매할 수 없습니다.");
         }
 
+        if (transactionRepository.existsByBuyerIdAndItemId(userId, itemId)) {
+            throw new IllegalStateException("이미 구매한 아이템입니다.");
+        }
+
         long price = item.getPrice();
         if (buyer.getCredits() < price) {
             throw new IllegalStateException("크레딧이 부족합니다.");
@@ -147,9 +152,10 @@ public class MarketService {
 
         transactionRepository.save(transaction);
 
-        // on Formula or manual update if needed)
-        // Since we use @Formula, we don't need to manually update salesCount field
-        // unless we cache it.
+        // [추가됨] 템플릿 구매 시 자동으로 '내 템플릿'으로 복제 (Snapshot)
+        if ("TEMPLATE".equalsIgnoreCase(item.getCategory())) {
+            createTemplateFromMarketItem(buyer, item);
+        }
     }
 
     @Transactional
@@ -165,18 +171,11 @@ public class MarketService {
         }
 
         if (item.getSeller() != null && item.getSeller().getId().equals(userId)) {
-            // Self-purchase check might be skipped for system items if seller is null?
-            // But here seller is likely not null.
             throw new IllegalStateException("본인의 아이템은 구매할 수 없습니다.");
         }
 
-        // Check if already purchased
         if (transactionRepository.existsByBuyerIdAndItemId(userId, item.getId())) {
-            // Depending on logic, maybe allow multiple? But stickers usually once.
-            // For now, let's treat it as idempotent or throw.
-            // Given the user complaint "purchase not unlocking", maybe they rebuy?
-            // Let's safe guard.
-            return; // Already owned, just return success.
+            return; // Already owned
         }
 
         long price = item.getPrice();
@@ -199,6 +198,35 @@ public class MarketService {
                 .build();
 
         transactionRepository.save(transaction);
+
+        // [추가됨] 템플릿 구매 시 처리
+        if ("TEMPLATE".equalsIgnoreCase(item.getCategory())) {
+            createTemplateFromMarketItem(buyer, item);
+        }
+    }
+
+    private void createTemplateFromMarketItem(User buyer, MarketItem item) {
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            com.project.byeoryback.domain.post.dto.PostTemplateDto.CreateRequest templateData = mapper.readValue(
+                    item.getContentJson(), com.project.byeoryback.domain.post.dto.PostTemplateDto.CreateRequest.class);
+
+            com.project.byeoryback.domain.post.entity.PostTemplate template = com.project.byeoryback.domain.post.entity.PostTemplate
+                    .builder()
+                    .user(buyer)
+                    .name(item.getName()) // Or templateData.getName()
+                    .styles(templateData.getStyles())
+                    .stickers(templateData.getStickers())
+                    .floatingTexts(templateData.getFloatingTexts())
+                    .floatingImages(templateData.getFloatingImages())
+                    .defaultFontColor(templateData.getDefaultFontColor())
+                    .sourceMarketItemId(item.getId())
+                    .build();
+
+            postTemplateRepository.save(template);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create template from market item", e);
+        }
     }
 
     @Transactional

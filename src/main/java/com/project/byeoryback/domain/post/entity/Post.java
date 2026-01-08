@@ -76,6 +76,11 @@ public class Post {
     @Builder.Default
     private Boolean isPublic = true;
 
+    // [추가됨] 배경 스타일 스냅샷 (Snapshot)
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private java.util.Map<String, Object> styles;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostHashtag> postHashtags = new java.util.ArrayList<>();
@@ -118,7 +123,7 @@ public class Post {
     public void update(String title, java.util.Map<String, Object> titleStyles, List<Block> blocks,
             List<FloatingItem> stickers,
             List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, Boolean isFavorite, String mode,
-            Boolean isPublic) {
+            Boolean isPublic, java.util.Map<String, Object> styles) {
         this.title = title;
         this.titleStyles = titleStyles;
         this.blocks = blocks;
@@ -129,9 +134,10 @@ public class Post {
             this.isFavorite = isFavorite;
         }
         this.mode = mode;
-        this.mode = mode;
         if (isPublic != null)
             this.isPublic = isPublic;
+        if (styles != null)
+            this.styles = styles;
     }
 
     public void clearPostHashtags() {

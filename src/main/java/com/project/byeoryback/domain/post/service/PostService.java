@@ -50,7 +50,8 @@ public class PostService {
                 .floatingImages(request.getFloatingImages())
                 .user(user)
                 .isFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false)
-                .isPublic(request.getIsPublic() != null ? request.getIsPublic() : true) // [체크] 빌더에 isPublic 추가 필요
+                .isPublic(request.getIsPublic() != null ? request.getIsPublic() : true)
+                .styles(request.getStyles())
                 .build();
 
         Post savedPost = postRepository.save(post);
@@ -86,7 +87,8 @@ public class PostService {
                 request.getFloatingImages(),
                 request.getIsFavorite(),
                 request.getMode(),
-                request.getIsPublic());
+                request.getIsPublic(),
+                request.getStyles());
 
         hashtagService.processHashtags(post, request.getTags());
 

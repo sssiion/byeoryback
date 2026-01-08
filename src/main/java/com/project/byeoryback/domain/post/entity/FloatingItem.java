@@ -11,15 +11,15 @@ import java.util.Map;
 @NoArgsConstructor
 public class FloatingItem {
     private String id;
-    private double x;
-    private double y;
-    private double w;
-    private double h;
+    private Object x;
+    private Object y;
+    private Object w;
+    private Object h;
     private double rotation;
 
     @JsonProperty("zIndex")
     private int zIndex;
-    private double opacity;
+    private Double opacity = 1.0;
     private String url; // 이미지 URL
     private String text; // 텍스트 내용 (FloatingText용)
     private Map<String, Object> styles; // 스타일
