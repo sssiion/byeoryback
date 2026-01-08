@@ -15,7 +15,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts", indexes = {
+        // 1. 아까 추가한 내 글 조회용
+        @Index(name = "idx_posts_user_created", columnList = "user_id, created_at DESC"),
+
+        // 2. [NEW] 지금 추가할 커뮤니티 조회용
+        @Index(name = "idx_posts_public_created", columnList = "is_public, created_at DESC")
+})
 @Getter
 @Builder
 @NoArgsConstructor
