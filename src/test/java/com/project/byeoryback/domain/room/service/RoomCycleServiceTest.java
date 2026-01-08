@@ -43,6 +43,12 @@ class RoomCycleServiceTest {
     private RoomRepository roomRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private com.project.byeoryback.domain.user.repository.UserProfileRepository userProfileRepository;
+    @Mock
+    private com.project.byeoryback.domain.post.service.PostService postService;
+    @Mock
+    private com.project.byeoryback.domain.post.repository.PostRepository postRepository;
 
     @Test
     @DisplayName("Create Cycle - Success")

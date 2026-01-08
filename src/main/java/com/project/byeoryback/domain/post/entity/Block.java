@@ -1,4 +1,5 @@
 package com.project.byeoryback.domain.post.entity;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Map;
@@ -10,10 +11,14 @@ public class Block {
     private String id;
     private String type; // paragraph, image-full 등
     private String text;
-    private String imageUrl;  // 여기에 Supabase URL 등이 저장됨
+    private String imageUrl; // 여기에 Supabase URL 등이 저장됨
     private String imageUrl2;
     private Integer imageRotation;
     private String imageFit;
     private Map<String, Object> styles;
-}
 
+    // 교환일기용 추가 필드
+    private String date;
+    private String feeling;
+    private String weather;
+}

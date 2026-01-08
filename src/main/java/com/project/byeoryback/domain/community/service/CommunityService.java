@@ -5,7 +5,7 @@ import com.project.byeoryback.domain.post.entity.Post;
 import com.project.byeoryback.domain.post.entity.PostLike;
 import com.project.byeoryback.domain.post.entity.PostStat;
 import com.project.byeoryback.domain.post.repository.PostLikeRepository;
-import com.project.byeoryback.domain.post.repository.PostRepository; // PostRepository 사용
+import com.project.byeoryback.domain.post.repository.PostRepository;
 import com.project.byeoryback.domain.post.repository.PostStatRepository;
 import com.project.byeoryback.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

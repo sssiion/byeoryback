@@ -9,4 +9,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByMarketItemIdOrderByCreatedAtDesc(Long marketItemId);
 
     boolean existsByUserIdAndMarketItemId(Long userId, Long marketItemId);
+
+    void deleteByUser(com.project.byeoryback.domain.user.entity.User user);
 }
