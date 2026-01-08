@@ -53,6 +53,48 @@ public class CommunityService {
         // DTO 변환 시 Post와 PostStat 정보 합침
         return CommunityDto.Response.from(post, postStat, isLiked);
     }
+    @Transactional // 조회만 하므로 readOnly 권장
+    public CommunityDto.Response getCommunityForCard(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+
+        // 공개글 체크
+        if (!Boolean.TRUE.equals(post.getIsPublic())) {
+            throw new IllegalArgumentException("비공개 게시글입니다.");
+        }
+
+        // PostStat 조회 (조회수 증가는 하지 않음)
+        // 만약 통계 데이터가 아예 없다면 0으로 생성해서 보여줌
+        PostStat postStat = postStatRepository.findByPostId(postId).orElseGet(() -> {
+            PostStat newStat = PostStat.builder().post(post).build();
+            return postStatRepository.save(newStat);
+        });
+
+        // 좋아요 여부 체크
+        boolean isLiked = false;
+        if (userId != null && userId != 0L) {
+            // exists 쿼리가 가볍기 때문에 유저 존재 여부 체크 없이 바로 날려도 무방하지만,
+            // 안전하게 하려면 유저 조회 후 진행
+            try {
+                com.project.byeoryback.domain.user.entity.User user = userRepository.getReferenceById(userId);
+                isLiked = postLikeRepository.existsByUserAndPost(user, post);
+            } catch (Exception e) {
+                // 유저 ID가 잘못되었거나 없는 경우 false 처리
+            }
+        }
+
+        return CommunityDto.Response.from(post, postStat, isLiked);
+    }
+    @Transactional
+    public void increaseViewCount(Long postId) {PostStat postStat = postStatRepository.findByPostId(postId)
+            .orElseGet(() -> {
+                Post post = postRepository.findById(postId)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+                return postStatRepository.save(PostStat.builder().post(post).build());
+            });
+
+        postStat.increaseViewCount(); // Dirty Checking으로 자동 업데이트
+    }
 
     // 단순 조회용 (오버로딩)
     @Transactional
