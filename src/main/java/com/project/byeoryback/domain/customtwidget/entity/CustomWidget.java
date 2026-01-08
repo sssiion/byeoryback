@@ -1,4 +1,4 @@
-package com.project.byeoryback.domain.widget.entity;
+package com.project.byeoryback.domain.customtwidget.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.byeoryback.domain.user.entity.User;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Widget {
+public class CustomWidget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
