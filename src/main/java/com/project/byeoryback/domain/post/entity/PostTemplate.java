@@ -56,6 +56,9 @@ public class PostTemplate {
     @Column(length = 7)
     private String defaultFontColor;
 
+    @Column
+    private String thumbnailUrl;
+
     // Link to Market Item if this is a purchased template (optional)
     @Column
     private Long sourceMarketItemId;
@@ -68,7 +71,8 @@ public class PostTemplate {
     private LocalDateTime updatedAt;
 
     public void update(String name, Map<String, Object> styles, List<FloatingItem> stickers,
-            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, String defaultFontColor) {
+            List<FloatingItem> floatingTexts, List<FloatingItem> floatingImages, String defaultFontColor,
+            String thumbnailUrl) {
         if (name != null)
             this.name = name;
         if (styles != null)
@@ -81,5 +85,7 @@ public class PostTemplate {
             this.floatingImages = floatingImages;
         if (defaultFontColor != null)
             this.defaultFontColor = defaultFontColor;
+        if (thumbnailUrl != null)
+            this.thumbnailUrl = thumbnailUrl;
     }
 }

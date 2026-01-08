@@ -38,9 +38,9 @@ public class PostTemplateService {
                 .name(request.getName())
                 .styles(request.getStyles())
                 .stickers(request.getStickers())
-                .floatingTexts(request.getFloatingTexts())
                 .floatingImages(request.getFloatingImages())
                 .defaultFontColor(request.getDefaultFontColor())
+                .thumbnailUrl(request.getThumbnailUrl())
                 .build();
 
         return PostTemplateDto.Response.from(postTemplateRepository.save(template));
