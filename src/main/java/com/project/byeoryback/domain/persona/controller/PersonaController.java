@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/persona")
@@ -24,11 +21,20 @@ public class PersonaController {
     private final UserRepository userRepository;
 
     @PostMapping("/analyze")
-    public ResponseEntity<?> analyzePersona(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> analyzePersona(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestParam(required = false) Integer year, // 파라미터가 올 수도, 안 올 수도 있음
+                                            @RequestParam(required = false) Integer month
+    ) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        personaService.analyzePersona(user.getId());
+        if(year !=null && month !=null){
+            personaService.analyzePersona(user.getId(),year,month);
+
+        }else{
+            personaService.analyzePersona(user.getId());
+
+        }
         return ResponseEntity.ok("Persona analysis completed");
     }
 
