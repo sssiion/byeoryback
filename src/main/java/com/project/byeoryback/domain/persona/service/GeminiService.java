@@ -1,5 +1,7 @@
 package com.project.byeoryback.domain.persona.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.byeoryback.domain.persona.dto.gemini.GeminiRequest;
 import com.project.byeoryback.domain.persona.dto.gemini.GeminiResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class GeminiService {
         private String apiKey;
 
         private final WebClient.Builder webClientBuilder;
+        private final ObjectMapper objectMapper; // JSON 변환을 위해 주입
 
         private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemma-3-12b-it:generateContent";
 
@@ -56,4 +59,29 @@ public class GeminiService {
 
                 return null;
         }
+    // 2. [추가] JSON 파싱 메서드 (제네릭 사용)
+    public <T> T getAnalyzedJson(String prompt, Class<T> responseType) {
+        String jsonResponse = analyzeText(prompt);
+
+        if (jsonResponse == null) {
+            throw new RuntimeException("Gemini API 응답이 없습니다.");
+        }
+
+        // AI가 가끔 마크다운 코드블록(```json ... ```)을 포함해서 주므로 제거
+        String cleanedJson = jsonResponse.replace("```json", "").replace("```", "").trim();
+
+        // 중괄호 앞뒤의 불필요한 텍스트 제거 (안전장치)
+        int startIndex = cleanedJson.indexOf("{");
+        int endIndex = cleanedJson.lastIndexOf("}");
+        if (startIndex != -1 && endIndex != -1) {
+            cleanedJson = cleanedJson.substring(startIndex, endIndex + 1);
+        }
+
+        try {
+            return objectMapper.readValue(cleanedJson, responseType);
+        } catch (JsonProcessingException e) {
+            log.error("JSON Parsing Error: {}", cleanedJson); // 에러 발생 시 원본 확인
+            throw new RuntimeException("AI 응답을 객체로 변환하는데 실패했습니다.", e);
+        }
+    }
 }

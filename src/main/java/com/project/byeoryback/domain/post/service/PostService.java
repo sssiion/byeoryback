@@ -14,7 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -120,6 +126,55 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    // 1년전 데이터 가져오기
+    public Post getMemorablePostFromOneYearAgo(Long userId){ // 1년전 포스트 가져오기
+        LocalDate today = LocalDate.now();
+        LocalDate oneYearAgoDate = today.minusYears(1); // 기준점: 딱 1년 전 날짜
+
+        // -------------------------------------------------------
+        // 1단계: 딱 1년 전 '오늘' (00:00:00 ~ 23:59:59) 조회
+        // -------------------------------------------------------
+        LocalDateTime startOfDay = oneYearAgoDate.atStartOfDay();
+        LocalDateTime endOfDay = oneYearAgoDate.atTime(LocalTime.MAX);
+
+        List<Post> todayPosts = postRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                userId, startOfDay, endOfDay
+        );
+
+        if (!todayPosts.isEmpty()) {
+            return getRichestPostByBlockCount(todayPosts);
+        }
+
+        // -------------------------------------------------------
+        // 2단계: '오늘'이 없다면 -> [1년 전 그달] 부터 [3달 전]까지 역추적
+        // -------------------------------------------------------
+        // 예: 1년 전이 5월이면 -> 5월 전체 -> 4월 전체 -> 3월 전체 순으로 조회
+        for (int i = 0; i < 3; i++) {
+            // 검사할 월 계산 (0: 이번달, 1: 전달, 2: 전전달)
+            YearMonth targetYearMonth = YearMonth.from(oneYearAgoDate.minusMonths(i));
+
+            // 그 달의 1일 00:00:00 ~ 그 달의 말일 23:59:59
+            LocalDateTime startOfMonth = targetYearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endOfMonth = targetYearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+
+            // ** 기존 리포지토리 메서드 재활용 **
+            List<Post> monthlyPosts = postRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    userId, startOfMonth, endOfMonth
+            );
+
+            if (!monthlyPosts.isEmpty()) {
+                return getRichestPostByBlockCount(monthlyPosts);
+            }
+        }
+
+        // 3단계: 3달을 뒤져도 없으면 메시지 처리를 위한 예외 발생
+        throw new IllegalStateException("추억을 불러올 데이터가 없어요.");
+    }
+
+    public Post findRandomPostByUserId(Long userId) {
+        return postRepository.findRandomPostByUserId(userId);
+
+    }
     // 5. 월별 게시글 요약 조회
     public List<com.project.byeoryback.domain.post.dto.PostSummaryResponse> getPostsSummaryByYearMonth(Long userId,
             int year, int month) {
@@ -131,5 +186,14 @@ public class PostService {
                 .map(com.project.byeoryback.domain.post.dto.PostSummaryResponse::from)
                 .toList();
     }
-
+    // 블록(Block) 개수가 가장 많은 포스트 반환
+    private Post getRichestPostByBlockCount(List<Post> posts) {
+        return posts.stream()
+                // blocks가 null일 경우 0으로 처리하여 에러 방지
+                .max(Comparator.comparingInt(post -> {
+                    if (post.getBlocks() == null) return 0;
+                    return post.getBlocks().size();
+                }))
+                .orElse(posts.get(0));
+    }
 }

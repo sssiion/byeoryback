@@ -4,7 +4,9 @@ import com.project.byeoryback.domain.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -35,4 +37,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         // [New] 기간별(월별) 내 게시글 조회
         List<Post> findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(Long userId, java.time.LocalDateTime start,
                         java.time.LocalDateTime end);
-}
+
+        // [New] 특정 유저의 게시글 중 랜덤으로 1개 조회 (MySQL 기준)
+        @Query(value = "SELECT * FROM post WHERE user_id = :userId ORDER BY RAND() LIMIT 1", nativeQuery = true)
+        Post findRandomPostByUserId(@Param("userId") Long userId);
+    }
