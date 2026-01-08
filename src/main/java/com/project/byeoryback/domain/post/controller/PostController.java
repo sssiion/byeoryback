@@ -61,4 +61,18 @@ public class PostController {
         postService.deletePost(id);
         return ResponseEntity.ok().build();
     }
+
+    // 5. 월별 요약 조회 (Calendar용)
+    @GetMapping("/summary")
+    public ResponseEntity<List<com.project.byeoryback.domain.post.dto.PostSummaryResponse>> getMonthlyPostSummary(
+            @AuthenticationPrincipal com.project.byeoryback.global.security.CustomUserDetails userDetails,
+            @RequestParam(value = "year") int year,
+            @RequestParam(value = "month") int month) {
+
+        if (userDetails == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        return ResponseEntity.ok(postService.getPostsSummaryByYearMonth(userDetails.getUser().getId(), year, month));
+    }
 }

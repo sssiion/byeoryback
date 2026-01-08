@@ -118,4 +118,16 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    // 5. 월별 게시글 요약 조회
+    public List<com.project.byeoryback.domain.post.dto.PostSummaryResponse> getPostsSummaryByYearMonth(Long userId,
+            int year, int month) {
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(year, month, 1, 0, 0, 0);
+        java.time.LocalDateTime end = start.plusMonths(1).minusNanos(1); // End of the month
+
+        List<Post> posts = postRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, start, end);
+        return posts.stream()
+                .map(com.project.byeoryback.domain.post.dto.PostSummaryResponse::from)
+                .toList();
+    }
+
 }
