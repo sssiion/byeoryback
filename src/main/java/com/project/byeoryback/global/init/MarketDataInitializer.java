@@ -74,7 +74,7 @@ public class MarketDataInitializer {
                                                         "price", 2000L,
                                                         "tags", Arrays.asList("공부", "다이어리", "템플릿"),
                                                         "imageUrl",
-                                                        "https://cdn-icons-png.flaticon.com/512/4021/4021693.png"),
+                                                        "https://cdn-icons-png.flaticon.com/512/3209/3209265.png"),
                                         Map.of(
                                                         "referenceId", "sticker_pack_003",
                                                         "category", "sticker",
@@ -128,19 +128,87 @@ public class MarketDataInitializer {
 
                         for (Map<String, Object> data : initialItems) {
                                 String referenceId = (String) data.get("referenceId");
-                                String contentJson = objectMapper.writeValueAsString(Map.of(
-                                                "description", data.get("description"),
-                                                "imageUrl", data.get("imageUrl"),
-                                                "tags", data.get("tags")));
+                                String contentJson;
+
+                                if ("post_template_001".equals(referenceId)) {
+                                        // 공부 기록 템플릿용 JSON 생성 (PX 기반 레이아웃)
+                                        contentJson = objectMapper.writeValueAsString(Map.of(
+                                                        "name", data.get("name"),
+                                                        "styles", Map.of(
+                                                                        "backgroundColor", "#f8f9fa",
+                                                                        "padding", "340px 3rem 3rem 3rem", // ✨ Secure
+                                                                                                           // Header
+                                                                                                           // Space
+                                                                        "boxShadow",
+                                                                        "0 4px 6px -1px rgba(0, 0, 0, 0.1)"),
+                                                        "defaultFontColor", "#333333",
+                                                        "stickers", List.of(),
+                                                        "floatingTexts", Arrays.asList(
+                                                                        Map.of(
+                                                                                        "id", "ft-title", "x", "50%",
+                                                                                        "y", "40px", "w", 300, "h", 50,
+                                                                                        "zIndex", 10, "rotation", 0,
+                                                                                        "text", "오늘의 공부", "styles",
+                                                                                        Map.of("color", "#000000",
+                                                                                                        "fontSize",
+                                                                                                        "24px",
+                                                                                                        "fontWeight",
+                                                                                                        "bold",
+                                                                                                        "textAlign",
+                                                                                                        "center",
+                                                                                                        "transform",
+                                                                                                        "translateX(-50%)")),
+                                                                        Map.of(
+                                                                                        "id", "ft-subject", "x", "10%",
+                                                                                        "y", "110px", "w", 300, "h", 40,
+                                                                                        "zIndex", 10, "rotation", 0,
+                                                                                        "text", "과목:",
+                                                                                        "styles",
+                                                                                        Map.of("color", "#555555",
+                                                                                                        "fontSize",
+                                                                                                        "16px")),
+                                                                        Map.of(
+                                                                                        "id", "ft-time", "x", "60%",
+                                                                                        "y", "110px", "w", 200, "h", 40,
+                                                                                        "zIndex", 10, "rotation", 0,
+                                                                                        "text", "시간:",
+                                                                                        "styles",
+                                                                                        Map.of("color", "#555555",
+                                                                                                        "fontSize",
+                                                                                                        "16px")),
+                                                                        Map.of(
+                                                                                        "id", "ft-goal", "x", "10%",
+                                                                                        "y", "170px", "w", 300, "h", 40,
+                                                                                        "zIndex", 10, "rotation", 0,
+                                                                                        "text", "🎯 오늘의 목표:", "styles",
+                                                                                        Map.of("color", "#000000",
+                                                                                                        "fontSize",
+                                                                                                        "18px",
+                                                                                                        "fontWeight",
+                                                                                                        "bold")),
+                                                                        Map.of(
+                                                                                        "id", "ft-memo", "x", "10%",
+                                                                                        "y", "220px", "w", 500, "h", 80,
+                                                                                        "zIndex", 10, "rotation", 0,
+                                                                                        "text", "",
+                                                                                        "styles",
+                                                                                        Map.of("color", "#888888",
+                                                                                                        "fontSize",
+                                                                                                        "14px",
+                                                                                                        "fontStyle",
+                                                                                                        "italic"))),
+                                                        "floatingImages", List.of(),
+                                                        "thumbnailUrl", data.get("imageUrl"),
+                                                        "imageUrl", data.get("imageUrl")));
+                                } else {
+                                        contentJson = objectMapper.writeValueAsString(Map.of(
+                                                        "description", data.get("description"),
+                                                        "imageUrl", data.get("imageUrl"),
+                                                        "tags", data.get("tags")));
+                                }
 
                                 MarketItem item;
                                 if (marketItemRepository.existsByReferenceId(referenceId)) {
-                                        // Assuming we need to fetch it to update.
-                                        // Since we don't have findByReferenceId exposed as Optional in the interface
-                                        // visible here (it might be, but let's be safe),
-                                        // and strict replacement is hard without seeing the Repo again.
-                                        // BUT I checked Repo and I ADDED findByReferenceId.
-                                        // So I can use it!
                                         item = marketItemRepository.findByReferenceId(referenceId).orElse(null);
                                 } else {
                                         item = MarketItem.builder()

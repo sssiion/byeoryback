@@ -19,11 +19,112 @@ public class PostTemplateService {
 
     private final PostTemplateRepository postTemplateRepository;
     private final UserRepository userRepository;
+    private final com.project.byeoryback.domain.market.repository.MarketItemRepository marketItemRepository;
+    private final com.project.byeoryback.domain.market.repository.MarketTransactionRepository marketTransactionRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
+    @Transactional
     public List<PostTemplateDto.Response> getMyTemplates(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return postTemplateRepository.findAllByUserOrderByCreatedAtDesc(user).stream()
+
+        List<PostTemplate> templates = postTemplateRepository.findAllByUserOrderByCreatedAtDesc(user);
+
+        // ✨ 1. Sync Missing Purchases (Retroactive Fix)
+        try {
+            List<com.project.byeoryback.domain.market.entity.MarketTransaction> transactions = marketTransactionRepository
+                    .findByBuyerIdOrderByTransactionDateDesc(userId);
+            boolean addedNew = false;
+
+            for (com.project.byeoryback.domain.market.entity.MarketTransaction tx : transactions) {
+                com.project.byeoryback.domain.market.entity.MarketItem item = tx.getItem();
+                if ("template_post".equalsIgnoreCase(item.getCategory())
+                        || "TEMPLATE".equalsIgnoreCase(item.getCategory())) {
+                    boolean exists = templates.stream().anyMatch(
+                            t -> t.getSourceMarketItemId() != null && t.getSourceMarketItemId().equals(item.getId()));
+                    if (!exists) {
+                        // Create missing template
+                        if (item.getContentJson() != null) {
+                            try {
+                                PostTemplateDto.CreateRequest freshData = objectMapper.readValue(item.getContentJson(),
+                                        PostTemplateDto.CreateRequest.class);
+                                PostTemplate newTemplate = PostTemplate.builder()
+                                        .user(user)
+                                        .name(item.getName())
+                                        .styles(freshData.getStyles())
+                                        .stickers(freshData.getStickers())
+                                        .floatingTexts(freshData.getFloatingTexts())
+                                        .floatingImages(freshData.getFloatingImages())
+                                        .defaultFontColor(freshData.getDefaultFontColor())
+                                        .thumbnailUrl(freshData.getThumbnailUrl())
+                                        .sourceMarketItemId(item.getId())
+                                        .build();
+                                postTemplateRepository.save(newTemplate);
+                                addedNew = true;
+                            } catch (Exception e) {
+                                System.err.println("Failed to sync template: " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (addedNew) {
+                templates = postTemplateRepository.findAllByUserOrderByCreatedAtDesc(user);
+            }
+        } catch (Exception e) {
+            System.err.println("Market sync failed: " + e.getMessage());
+        }
+
+        // ✨ 2. Self-Healing: Fix broken templates
+        for (PostTemplate template : templates) {
+            if (template.getSourceMarketItemId() != null) { // Check if it looks broken (e.g. "Study Record" but no text
+                                                            // fields OR old padding)
+                boolean isBroken = false;
+                if ("공부 기록 템플릿".equals(template.getName())) {
+                    if (template.getFloatingTexts() == null || template.getFloatingTexts().isEmpty()) {
+                        isBroken = true;
+                    } else {
+                        // Check for old padding
+                        Object padding = template.getStyles().get("padding");
+                        if ("3rem".equals(padding)) {
+                            isBroken = true; // Trigger update to new padding
+                        }
+
+                        // Check for confusing placeholder text or underscores
+                        if (template.getFloatingTexts().stream().anyMatch(ft -> "(비워둠)".equals(ft.getText())
+                                || (ft.getText() != null && ft.getText().contains("_")))) {
+                            isBroken = true;
+                        }
+                    }
+                }
+
+                if (isBroken) {
+                    try {
+                        com.project.byeoryback.domain.market.entity.MarketItem marketItem = marketItemRepository
+                                .findById(template.getSourceMarketItemId()).orElse(null);
+                        if (marketItem != null && marketItem.getContentJson() != null) {
+                            PostTemplateDto.CreateRequest freshData = objectMapper
+                                    .readValue(marketItem.getContentJson(), PostTemplateDto.CreateRequest.class);
+
+                            template.update(
+                                    freshData.getName(),
+                                    freshData.getStyles(),
+                                    freshData.getStickers(),
+                                    freshData.getFloatingTexts(),
+                                    freshData.getFloatingImages(),
+                                    freshData.getDefaultFontColor(),
+                                    freshData.getThumbnailUrl());
+                            postTemplateRepository.save(template);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Failed to heal template: " + e.getMessage());
+                    }
+                }
+            }
+        }
+
+        return templates.stream()
                 .map(PostTemplateDto.Response::from)
                 .collect(Collectors.toList());
     }

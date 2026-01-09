@@ -153,7 +153,7 @@ public class MarketService {
         transactionRepository.save(transaction);
 
         // [추가됨] 템플릿 구매 시 자동으로 '내 템플릿'으로 복제 (Snapshot)
-        if ("TEMPLATE".equalsIgnoreCase(item.getCategory())) {
+        if ("template_post".equalsIgnoreCase(item.getCategory()) || "TEMPLATE".equalsIgnoreCase(item.getCategory())) {
             createTemplateFromMarketItem(buyer, item);
         }
     }
@@ -200,7 +200,7 @@ public class MarketService {
         transactionRepository.save(transaction);
 
         // [추가됨] 템플릿 구매 시 처리
-        if ("TEMPLATE".equalsIgnoreCase(item.getCategory())) {
+        if ("template_post".equalsIgnoreCase(item.getCategory()) || "TEMPLATE".equalsIgnoreCase(item.getCategory())) {
             createTemplateFromMarketItem(buyer, item);
         }
     }
