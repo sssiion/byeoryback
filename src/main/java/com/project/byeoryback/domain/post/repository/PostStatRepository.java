@@ -9,4 +9,7 @@ public interface PostStatRepository extends JpaRepository<PostStat, Long> {
     Optional<PostStat> findByPostId(Long postId);
 
     void deleteByPostId(Long postId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(ps.likeCount) FROM PostStat ps JOIN ps.post p WHERE p.user.id = :userId")
+    Long sumLikesByUserId(@org.springframework.data.repository.query.Param("userId") Long userId);
 }
