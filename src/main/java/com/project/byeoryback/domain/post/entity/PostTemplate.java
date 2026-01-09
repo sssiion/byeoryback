@@ -16,6 +16,7 @@ import java.util.Map;
 @Entity
 @Table(name = "post_templates")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,6 +56,11 @@ public class PostTemplate {
     // Auto-Contrast: Default font color for this template
     @Column(length = 7)
     private String defaultFontColor;
+
+    // Tags for filtering (e.g. "acquired")
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> tags;
 
     @Column
     private String thumbnailUrl;

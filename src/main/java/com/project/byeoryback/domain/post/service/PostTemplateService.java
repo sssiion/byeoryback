@@ -58,6 +58,11 @@ public class PostTemplateService {
                                         .defaultFontColor(freshData.getDefaultFontColor())
                                         .thumbnailUrl(freshData.getThumbnailUrl())
                                         .sourceMarketItemId(item.getId())
+                                        .tags(java.util.stream.Stream.concat(
+                                                freshData.getTags() != null ? freshData.getTags().stream()
+                                                        : java.util.stream.Stream.empty(),
+                                                java.util.stream.Stream.of("acquired"))
+                                                .collect(java.util.stream.Collectors.toList()))
                                         .build();
                                 postTemplateRepository.save(newTemplate);
                                 addedNew = true;
@@ -96,6 +101,11 @@ public class PostTemplateService {
                                 || (ft.getText() != null && ft.getText().contains("_")))) {
                             isBroken = true;
                         }
+
+                        // Check for missing 'acquired' tag
+                        if (template.getTags() == null || !template.getTags().contains("acquired")) {
+                            isBroken = true;
+                        }
                     }
                 }
 
@@ -115,6 +125,17 @@ public class PostTemplateService {
                                     freshData.getFloatingImages(),
                                     freshData.getDefaultFontColor(),
                                     freshData.getThumbnailUrl());
+
+                            // Ensure acquired tag is present
+                            List<String> tags = template.getTags();
+                            if (tags == null)
+                                tags = new java.util.ArrayList<>();
+                            if (!tags.contains("acquired")) {
+                                tags = new java.util.ArrayList<>(tags);
+                                tags.add("acquired");
+                                template.setTags(tags);
+                            }
+
                             postTemplateRepository.save(template);
                         }
                     } catch (Exception e) {
@@ -142,6 +163,7 @@ public class PostTemplateService {
                 .floatingImages(request.getFloatingImages())
                 .defaultFontColor(request.getDefaultFontColor())
                 .thumbnailUrl(request.getThumbnailUrl())
+                .tags(request.getTags())
                 .build();
 
         return PostTemplateDto.Response.from(postTemplateRepository.save(template));

@@ -25,6 +25,7 @@ public class PostTemplateDto {
         private List<FloatingItem> floatingImages;
         private String defaultFontColor;
         private String thumbnailUrl;
+        private List<String> tags;
     }
 
     @Getter
@@ -41,6 +42,7 @@ public class PostTemplateDto {
         private List<FloatingItem> floatingImages;
         private String defaultFontColor;
         private String thumbnailUrl;
+        private List<String> tags;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -55,6 +57,7 @@ public class PostTemplateDto {
                     .floatingImages(entity.getFloatingImages())
                     .defaultFontColor(entity.getDefaultFontColor())
                     .thumbnailUrl(entity.getThumbnailUrl())
+                    .tags(entity.getTags())
                     .createdAt(entity.getCreatedAt())
                     .updatedAt(entity.getUpdatedAt())
                     .build();
