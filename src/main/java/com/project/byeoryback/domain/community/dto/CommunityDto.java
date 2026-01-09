@@ -23,6 +23,7 @@ public class CommunityDto {
                 private String writerNickname; // 작성자 닉네임
                 private Long viewCount;
                 private Long likeCount;
+                private Integer commentCount; // [Added]
                 private Boolean isPublic;
                 private Boolean isLiked; // [추가] 좋아요 여부
                 private LocalDateTime createdAt;
@@ -51,6 +52,7 @@ public class CommunityDto {
                                         .isPublic(post.getIsPublic())
                                         .isLiked(isLiked)
                                         .createdAt(post.getCreatedAt())
+                                        .commentCount(post.getMessages() != null ? post.getMessages().size() : 0) // [Added]
                                         .blocks(post.getBlocks())
                                         .stickers(post.getStickers())
                                         .floatingTexts(post.getFloatingTexts())

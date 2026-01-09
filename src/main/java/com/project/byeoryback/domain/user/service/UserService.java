@@ -31,6 +31,7 @@ public class UserService {
         private final UserRepository userRepository;
         private final UserProfileRepository userProfileRepository;
         private final PostRepository postRepository;
+        private final com.project.byeoryback.domain.post.repository.PostStatRepository postStatRepository; // Added
         private final TodoRepository todoRepository;
         private final PageSettingRepository pageSettingRepository;
         private final ThemeSettingRepository themeSettingRepository;
@@ -45,6 +46,50 @@ public class UserService {
                 UserProfile profile = userProfileRepository.findByUserId(userId)
                                 .orElseThrow(() -> new UserProfileNotFoundException(userId));
 
+                // Stats Calculation
+                // 1. Total Entries
+                long totalEntries = postRepository.countByUserId(userId);
+
+                // 2. Received Likes
+                Long receivedLikes = postStatRepository.sumLikesByUserId(userId);
+                if (receivedLikes == null)
+                        receivedLikes = 0L;
+
+                // 3. Streak Days
+                long streakDays = 0;
+                java.util.List<com.project.byeoryback.domain.post.entity.Post> posts = postRepository
+                                .findAllByUserIdOrderByCreatedAtDesc(userId);
+
+                if (!posts.isEmpty()) {
+                        java.time.LocalDate today = java.time.LocalDate.now();
+                        java.time.LocalDate yesterday = today.minusDays(1);
+                        java.time.LocalDate lastDate = posts.get(0).getCreatedAt().toLocalDate();
+
+                        // 연속일 계산은 오늘 혹은 어제 작성한 글이 있어야 시작됨 (그렇지 않으면 0일 or 끊김)
+                        // 하지만 "현재 연속 며칠째인가"를 보여주려면,
+                        // 가장 최근 글이 오늘이면 -> 오늘부터 카운트
+                        // 가장 최근 글이 어제이면 -> 어제부터 카운트
+                        // 그 이전이면 -> 0일 (연속 끊김)
+
+                        if (lastDate.equals(today) || lastDate.equals(yesterday)) {
+                                streakDays = 1;
+                                java.time.LocalDate currentDate = lastDate;
+
+                                for (int i = 1; i < posts.size(); i++) {
+                                        java.time.LocalDate nextDate = posts.get(i).getCreatedAt().toLocalDate();
+                                        if (nextDate.equals(currentDate)) {
+                                                continue; // 같은 날 여러 글 작성 시 패스
+                                        }
+                                        if (nextDate.equals(currentDate.minusDays(1))) {
+                                                streakDays++;
+                                                currentDate = nextDate;
+                                        } else {
+                                                break; // 연속 끊김
+                                        }
+                                }
+                        }
+                }
+
                 return new UserProfileResponse(
                                 profile.getUser().getId(),
                                 profile.getProfilePhoto(),
@@ -55,7 +100,10 @@ public class UserService {
                                 profile.getPhone(),
                                 profile.getGender(),
                                 profile.getBio(),
-                                profile.getUser().getCredits());
+                                profile.getUser().getCredits(),
+                                totalEntries,
+                                streakDays,
+                                receivedLikes);
         }
 
         @Transactional
