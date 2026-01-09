@@ -30,7 +30,9 @@ public class GeminiService {
                         throw new IllegalStateException(
                                         "Gemini API Key is missing. Please set GEMINI_API_KEY in your .env file.");
                 }
-                WebClient webClient = webClientBuilder.build();
+                WebClient webClient = webClientBuilder
+                        .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                        .build();
 
                 GeminiRequest request = GeminiRequest.builder()
                                 .contents(Collections.singletonList(
@@ -47,6 +49,8 @@ public class GeminiService {
                                 .bodyValue(request)
                                 .retrieve()
                                 .bodyToMono(GeminiResponse.class)
+                                .retryWhen(reactor.util.retry.Retry.backoff(3, java.time.Duration.ofSeconds(2))
+                                        .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable))
                                 .block();
 
                 if (response != null && response.getCandidates() != null && !response.getCandidates().isEmpty()) {

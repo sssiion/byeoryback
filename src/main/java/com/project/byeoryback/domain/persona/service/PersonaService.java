@@ -19,6 +19,13 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 
+import com.project.byeoryback.domain.persona.dto.PersonaSettingsRequest;
+import com.project.byeoryback.domain.hashtag.entity.PostHashtag;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,6 +37,50 @@ public class PersonaService {
     private final PersonaRepository personaRepository;
     private final GeminiService geminiService; // AI 연동 서비스
     private final ObjectMapper objectMapper;
+
+    public PersonaSettingsRequest getSettings(Long userId) {
+        List<String> excludedHashtags = personaRepository.findByUserId(userId)
+                .map(Persona::getExcludedHashtags)
+                .filter(s -> s != null && !s.trim().isEmpty())
+                .map(s -> Arrays.stream(s.split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+
+        PersonaSettingsRequest response = new PersonaSettingsRequest();
+        response.setExcludedHashtags(excludedHashtags);
+        return response;
+    }
+
+    @Transactional
+    public void updateSettings(Long userId, PersonaSettingsRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        String excludedHashtagsStr = "";
+        if (request.getExcludedHashtags() != null && !request.getExcludedHashtags().isEmpty()) {
+            excludedHashtagsStr = String.join(",", request.getExcludedHashtags());
+        }
+
+        String finalExcludedHashtagsStr = excludedHashtagsStr;
+
+        Persona persona = personaRepository.findByUserId(userId)
+                .map(p -> Persona.builder()
+                        .id(p.getId())
+                        .user(p.getUser())
+                        .analysisResult(p.getAnalysisResult())
+                        .emotionKeywords(p.getEmotionKeywords())
+                        .excludedHashtags(finalExcludedHashtagsStr) // Update excluded hashtags
+                        .createdAt(p.getCreatedAt())
+                        .build())
+                .orElse(Persona.builder()
+                        .user(user)
+                        .excludedHashtags(finalExcludedHashtagsStr)
+                        .createdAt(LocalDateTime.now())
+                        .build());
+
+        personaRepository.save(persona);
+    }
 
     @Transactional
     public void analyzePersona(Long userId) {
@@ -47,6 +98,15 @@ public class PersonaService {
     @Transactional
     public void analyzePersona(Long userId, Integer year, Integer month) {
         log.info("Analyze Persona - User: {}, Year: {}, Month: {}", userId, year, month);
+
+        // 0. 제외할 해시태그 목록 조회
+        Set<String> excludedTags = personaRepository.findByUserId(userId)
+                .map(Persona::getExcludedHashtags)
+                .filter(s -> s != null && !s.isEmpty())
+                .map(s -> Arrays.stream(s.split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toSet()))
+                .orElse(Collections.emptySet());
 
         // 1. 게시글 조회 (기간 필터링 적용)
         List<Post> posts;
@@ -68,9 +128,20 @@ public class PersonaService {
             throw new IllegalArgumentException("분석할 게시글이 존재하지 않습니다.");
         }
 
-        // 2. 게시글 내용 병합 (분석용 텍스트 생성)
+        // 2. 게시글 내용 병합 (분석용 텍스트 생성) - 필터링 적용
         StringBuilder sb = new StringBuilder();
         for (Post post : posts) {
+            // 필터링: 제외할 해시태그가 포함된 게시글은 건너뜀
+            if (!excludedTags.isEmpty()) {
+                boolean shouldExclude = post.getPostHashtags().stream()
+                        .map(ph -> ph.getHashtag().getName()) // Hashtag 엔티티의 이름 필드 가정
+                        .anyMatch(tagName -> excludedTags.contains(tagName));
+                
+                if (shouldExclude) {
+                    continue;
+                }
+            }
+
             if (post.getTitle() != null) sb.append("Title: ").append(post.getTitle()).append("\n");
 
             // 텍스트 블록
@@ -92,7 +163,7 @@ public class PersonaService {
 
         // 텍스트가 너무 짧으면 분석 중단 (비용 절감)
         if (allContent.length() < 50) {
-            throw new IllegalArgumentException("게시글 내용이 너무 적어 분석할 수 없습니다.");
+            throw new IllegalArgumentException("분석할 게시글 내용이 부족합니다. (필터링 후)");
         }
 
         // 3. AI 프롬프트 구성 (JSON 응답 요청)
@@ -170,6 +241,7 @@ public class PersonaService {
                                 .user(user)
                                 .analysisResult(finalJsonResult) // JSON 통째로 저장
                                 .emotionKeywords(finalKeywords)  // 검색용 키워드 저장
+                                .excludedHashtags(p.getExcludedHashtags()) // [중요] 기존 제외 태그 설정 유지
                                 .createdAt(LocalDateTime.now())
                                 .build())
                         .orElse(Persona.builder()

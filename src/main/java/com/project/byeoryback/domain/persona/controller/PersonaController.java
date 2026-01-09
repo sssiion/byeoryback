@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.byeoryback.domain.persona.dto.PersonaSettingsRequest; // Add import
+
 @RestController
 @RequestMapping("/api/persona")
 @RequiredArgsConstructor
@@ -19,6 +21,25 @@ public class PersonaController {
     private final PersonaService personaService;
     private final PersonaRepository personaRepository;
     private final UserRepository userRepository;
+
+    @GetMapping("/settings")
+    public ResponseEntity<PersonaSettingsRequest> getSettings(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        PersonaSettingsRequest settings = personaService.getSettings(user.getId());
+        return ResponseEntity.ok(settings);
+    }
+
+    @PutMapping("/settings")
+    public ResponseEntity<?> updateSettings(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestBody PersonaSettingsRequest request) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        personaService.updateSettings(user.getId(), request);
+        return ResponseEntity.ok("Persona settings updated");
+    }
 
     @PostMapping("/analyze")
     public ResponseEntity<?> analyzePersona(@AuthenticationPrincipal UserDetails userDetails,

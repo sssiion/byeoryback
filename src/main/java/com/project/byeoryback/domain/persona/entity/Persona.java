@@ -33,6 +33,9 @@ public class Persona {
     @Column(columnDefinition = "TEXT")
     private String emotionKeywords; // Extracted Keywords
 
+    @Column(columnDefinition = "TEXT")
+    private String excludedHashtags; // Hashtags to exclude from analysis (comma separated)
+
     @CreatedDate
     private LocalDateTime createdAt;
 }
