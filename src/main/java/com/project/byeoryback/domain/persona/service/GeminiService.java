@@ -17,52 +17,53 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class GeminiService {
 
-        @Value("${GEMINI_API_KEY:}")
-        private String apiKey;
+    @Value("${GEMINI_API_KEY:}")
+    private String apiKey;
 
-        private final WebClient.Builder webClientBuilder;
-        private final ObjectMapper objectMapper; // JSON 변환을 위해 주입
+    private final WebClient.Builder webClientBuilder;
+    private final ObjectMapper objectMapper; // JSON 변환을 위해 주입
 
-        private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemma-3-12b-it:generateContent";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-        public String analyzeText(String prompt) {
-                if (apiKey == null || apiKey.trim().isEmpty()) {
-                        throw new IllegalStateException(
-                                        "Gemini API Key is missing. Please set GEMINI_API_KEY in your .env file.");
-                }
-                WebClient webClient = webClientBuilder
-                        .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-                        .build();
-
-                GeminiRequest request = GeminiRequest.builder()
-                                .contents(Collections.singletonList(
-                                                GeminiRequest.Content.builder()
-                                                                .parts(Collections.singletonList(
-                                                                                GeminiRequest.Part.builder()
-                                                                                                .text(prompt)
-                                                                                                .build()))
-                                                                .build()))
-                                .build();
-
-                GeminiResponse response = webClient.post()
-                                .uri(GEMINI_API_URL + "?key=" + apiKey)
-                                .bodyValue(request)
-                                .retrieve()
-                                .bodyToMono(GeminiResponse.class)
-                                .retryWhen(reactor.util.retry.Retry.backoff(3, java.time.Duration.ofSeconds(2))
-                                        .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable))
-                                .block();
-
-                if (response != null && response.getCandidates() != null && !response.getCandidates().isEmpty()) {
-                        GeminiResponse.Candidate candidate = response.getCandidates().get(0);
-                        if (candidate.getContent() != null && candidate.getContent().getParts() != null
-                                        && !candidate.getContent().getParts().isEmpty()) {
-                                return candidate.getContent().getParts().get(0).getText();
-                        }
-                }
-
-                return null;
+    public String analyzeText(String prompt) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalStateException(
+                    "Gemini API Key is missing. Please set GEMINI_API_KEY in your .env file.");
         }
+        WebClient webClient = webClientBuilder
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .build();
+
+        GeminiRequest request = GeminiRequest.builder()
+                .contents(Collections.singletonList(
+                        GeminiRequest.Content.builder()
+                                .parts(Collections.singletonList(
+                                        GeminiRequest.Part.builder()
+                                                .text(prompt)
+                                                .build()))
+                                .build()))
+                .build();
+
+        GeminiResponse response = webClient.post()
+                .uri(GEMINI_API_URL + "?key=" + apiKey)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(GeminiResponse.class)
+                .retryWhen(reactor.util.retry.Retry.backoff(3, java.time.Duration.ofSeconds(2))
+                        .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable))
+                .block();
+
+        if (response != null && response.getCandidates() != null && !response.getCandidates().isEmpty()) {
+            GeminiResponse.Candidate candidate = response.getCandidates().get(0);
+            if (candidate.getContent() != null && candidate.getContent().getParts() != null
+                    && !candidate.getContent().getParts().isEmpty()) {
+                return candidate.getContent().getParts().get(0).getText();
+            }
+        }
+
+        return null;
+    }
+
     // 2. [추가] JSON 파싱 메서드 (제네릭 사용)
     public <T> T getAnalyzedJson(String prompt, Class<T> responseType) {
         String jsonResponse = analyzeText(prompt);
