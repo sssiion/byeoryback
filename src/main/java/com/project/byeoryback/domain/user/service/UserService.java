@@ -24,6 +24,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.byeoryback.domain.post.repository.PostTemplateRepository;
+
+import com.project.byeoryback.domain.quest.repository.QuestLogRepository;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -31,11 +35,13 @@ public class UserService {
         private final UserRepository userRepository;
         private final UserProfileRepository userProfileRepository;
         private final PostRepository postRepository;
+        private final PostTemplateRepository postTemplateRepository; // Added for deletion
         private final com.project.byeoryback.domain.post.repository.PostStatRepository postStatRepository; // Added
         private final TodoRepository todoRepository;
         private final PageSettingRepository pageSettingRepository;
         private final ThemeSettingRepository themeSettingRepository;
         private final MenuSettingRepository menuSettingRepository;
+        private final QuestLogRepository questLogRepository; // Added for deletion
 
         private final AlbumRepository albumRepository;
         private final RoomRepository roomRepository;
@@ -173,10 +179,19 @@ public class UserService {
                 // deleteByUserId (raw delete) causes Foreign Key Constraint violations.
                 java.util.List<com.project.byeoryback.domain.post.entity.Post> posts = postRepository
                                 .findAllByUserIdOrderByCreatedAtDesc(userId);
-                postRepository.deleteAll(posts);
+                posts.forEach(post -> {
+                        // Post와 연관된 엔티티들이 Cascade 설정이 안되어 있을 수 있으므로 확인 필요
+                        postRepository.delete(post);
+                });
+
+                // 2-1. Delete Post Templates
+                postTemplateRepository.deleteAll(postTemplateRepository.findAllByUser(user));
 
                 // 3. Delete Todos
                 // Handled by CascadeType.ALL on User entity
+
+                // 3-1. Delete Quest Logs
+                questLogRepository.deleteByUser(user);
 
                 // 4. Delete Settings
                 pageSettingRepository.deleteByUserId(userId);

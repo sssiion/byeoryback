@@ -9,4 +9,6 @@ import java.time.LocalDate;
 
 public interface QuestLogRepository extends JpaRepository<QuestLog, Long> {
     boolean existsByUserAndQuestTypeAndQuestDate(User user, QuestType questType, LocalDate questDate);
+
+    void deleteByUser(User user);
 }
