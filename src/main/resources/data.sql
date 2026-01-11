@@ -48,18 +48,14 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('notification', '알림 설정', '앱 내 알림을 설정하고 관리합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["alert", "alarm", "push", "알람"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('clock', '시계', '다양한 스타일의 시계로 현재 시간을 확인합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["time", "watch", "시간"]', NOW(), NOW());
+
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('dday', 'D-Day', '중요한 날까지 남은 날짜를 카운트다운합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["calendar", "date", "anniversary", "기념일", "날짜"]', NOW(), NOW());
+('streak', '연속 기록', '글 작성 연속 기간을 측정합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["habit", "goal", "track", "습관", "목표"]', NOW(), NOW());
+
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('dday-balloon', '풍선 D-Day', '다가오는 D-Day를 풍선 애니메이션과 함께 보여줍니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["balloon", "party", "celebration", "축하"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('quick-links', '바로가기', '자주 방문하는 웹사이트나 기능으로 빠르게 이동합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["bookmark", "url", "shortcut", "북마크", "링크"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('streak', '연속 기록', '습관이나 목표 달성을 위한 연속 기록을 추적합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["habit", "goal", "track", "습관", "목표"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('stats', '통계', '사용자의 활동 데이터를 그래프와 차트로 보여줍니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["chart", "graph", "data", "분석"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('battery', '내 에너지', '나의 현재 에너지 레벨을 배터리 모양으로 표시합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["energy", "power", "status", "상태"]', NOW(), NOW());
+('battery', '내 에너지', '나의 현재 에너지 레벨을 배터리 모양으로 표시합니다.', 'Utility', '1x1', '[[1, 1]]', '{}', true, '["energy", "power", "status", "상태"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('worry-shredder', '근심 파쇄기', '걱정거리를 적고 파쇄기에 넣어 없애버리세요.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["stress", "delete", "remove", "걱정", "삭제", "파쇄"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -68,8 +64,7 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('biorhythm', '바이오리듬', '신체, 감성, 지성 리듬의 상태를 확인합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["health", "body", "mind", "건강"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('meditation-timer', '명상 타이머', '집중과 휴식을 위한 명상 타이머입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["relax", "focus", "zen", "휴식"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('mandalart', '만다라트 계획표', '목표 달성을 위한 만다라트 계획표를 작성합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["plan", "goal", "grid", "계획"]', NOW(), NOW());
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('recipe-card', '레시피 카드', '좋아하는 요리 레시피를 카드 형태로 보관합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["cook", "food", "kitchen", "요리", "음식"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -108,18 +103,15 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('unit-converter', '단위 변환기', '길이, 무게, 온도 등 다양한 단위를 변환합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["convert", "measure", "scale", "변환"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('calculator', '계산기', '간단한 사칙연산을 수행할 수 있는 계산기입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["math", "plus", "minus", "더하기"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('markdown-viewer', '마크다운 뷰어', '마크다운 문서를 미리보기하고 서식을 확인합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["md", "text", "doc", "문서"]', NOW(), NOW());
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('random-picker', '랜덤 뽑기', '무작위 추첨이나 제비뽑기를 할 때 유용합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["lottery", "luck", "choice", "추첨"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('ladder-game', '사다리 타기', '순서 정하기나 당번 정하기에 좋은 사다리 게임입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["game", "team", "order", "게임"]', NOW(), NOW());
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('map-pin', '지도 핀', '지도 위에 주요 장소를 핀으로 표시합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["location", "place", "gps", "위치"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('rss-reader', '기사 모음', '구독한 RSS 피드의 최신 글을 모아두는 뷰어입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["news", "feed", "blog", "뉴스"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('file-viewer', '파일 뷰어', '다양한 형식의 파일을 열람할 수 있는 뷰어입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["view", "read", "open", "파일"]', NOW(), NOW());
+
 
 -- More Decoration & Community
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -182,8 +174,7 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('chat-diary', '나와의 채팅', '메신저 형식으로 나 자신과 대화를 나눕니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["talk", "message", "chat", "대화"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('tag-cloud', '태그 구름', '자주 사용하는 태그들을 구름 모양으로 보여줍니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["keyword", "cloud", "text", "단어"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('timeline', '세로 타임라인', '시간 순서대로 일정을 보여주는 타임라인입니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["history", "flow", "schedule", "일정"]', NOW(), NOW());
+
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('scratch-card', '복권 긁기', '은박을 긁어서 당첨 결과를 확인하는 재미를 느껴보세요.', 'Interactive', '2x2', '[[2, 2]]', '{}', true, '["lottery", "luck", "scrtach", "복권"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -198,7 +189,6 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('magnifier', '돋보기', '화면의 특정 부분을 크게 확대해서 볼 수 있습니다.', 'Global', '1x1', '[[1, 1]]', '{}', true, '["zoom", "big", "view", "확대"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('ruby-text', '루비 문자', '텍스트 위에 발음이나 설명을 작게 달아줍니다.', 'Global', '1x1', '[[1, 1]]', '{}', true, '["text", "annotation", "font", "문자"]', NOW(), NOW());
-
 
 -- Widget Size Updates (Applied after initial insert)
 UPDATE widget_definitions SET default_size = '4x1', valid_sizes = '[[1, 1], [4, 1]]', updated_at = NOW() WHERE widget_type = 'welcome';
@@ -223,30 +213,21 @@ UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [1, 
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'weather';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'notification';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2], [4, 1]]', updated_at = NOW() WHERE widget_type = 'clock';
-UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'dday';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2]]', updated_at = NOW() WHERE widget_type = 'dday-balloon';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [3, 1], [4, 1]]', updated_at = NOW() WHERE widget_type = 'quick-links';
-UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'streak';
-UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'stats';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [2, 1]]', updated_at = NOW() WHERE widget_type = 'battery';
+
+
+UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1]]', description = '글 작성 연속 기간을 측정합니다.', updated_at = NOW() WHERE widget_type = 'streak';
+
+UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', updated_at = NOW() WHERE widget_type = 'battery';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [2, 1]]', updated_at = NOW() WHERE widget_type = 'worry-shredder';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'scrap-note';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'biorhythm';
-UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'meditation-timer';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 3]]', updated_at = NOW() WHERE widget_type = 'mandalart';
-UPDATE widget_definitions SET default_size = '2x3', valid_sizes = '[[1, 1], [2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'recipe-card';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2], [3, 3]]', updated_at = NOW() WHERE widget_type = 'fandom-calendar';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2]]', updated_at = NOW() WHERE widget_type = 'worry-doll';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'unit-converter';
+UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 1], [2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'scrap-note';
+UPDATE widget_definitions SET default_size = '2x3', valid_sizes = '[[1, 2], [2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'recipe-card';
+UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'worry-doll';
+UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 2], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'unit-converter';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'calculator';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [3, 3]]', updated_at = NOW() WHERE widget_type = 'markdown-viewer';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 2], [2, 3], [3, 3]]', updated_at = NOW() WHERE widget_type = 'random-picker';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 3], [4, 4]]', updated_at = NOW() WHERE widget_type = 'ladder-game';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [2, 1]]', updated_at = NOW() WHERE widget_type = 'map-pin';
+UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'map-pin';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2], [3, 3], [4, 2]]', updated_at = NOW() WHERE widget_type = 'rss-reader';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 3], [4, 3]]', updated_at = NOW() WHERE widget_type = 'file-viewer';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 1], [2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'tag-cloud';
-UPDATE widget_definitions SET default_size = '4x1', valid_sizes = '[[4, 1], [4, 2]]', updated_at = NOW() WHERE widget_type = 'timeline';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2], [3, 3]]', updated_at = NOW() WHERE widget_type = 'color-palette';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[2, 1], [3, 1]]', updated_at = NOW() WHERE widget_type = 'typewriter';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2], [2, 2]]', updated_at = NOW() WHERE widget_type = 'polaroid';
