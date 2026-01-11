@@ -1,6 +1,5 @@
 package com.project.byeoryback.domain.widget.entity;
 
-
 import com.project.byeoryback.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,7 +27,7 @@ public class WidgetDefinition {
 
     // 위젯 식별자 (프론트엔드 컴포넌트 매핑용)
     // 예: "timeline", "scratch-card", "weather"
-    @Column(name = "widget_type", nullable = false, length = 50)
+    @Column(name = "widget_type", nullable = false, length = 50, unique = true)
     private String widgetType;
 
     // 표시 이름 (예: "타임라인", "복권 긁기")
