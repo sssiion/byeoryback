@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public record AllSettingsResponse(
-        ThemeDto theme,
-        MenuDto menu,
-        List<Map<String, Object>> widget,
-        PageDto page) {
+                ThemeDto theme,
+                MenuDto menu,
+                List<Map<String, Object>> widget,
+                PageDto page,
+                com.project.byeoryback.domain.setting.header.HeaderDto header) {
 }

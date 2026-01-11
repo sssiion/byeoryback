@@ -35,6 +35,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
     private final WidgetService widgetService;
+    private final com.project.byeoryback.domain.setting.header.HeaderService headerService;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -64,6 +65,7 @@ public class AuthService {
 
         // 기본 위젯 설정 초기화
         widgetService.initializeDefaultWidgets(user);
+        headerService.initializeDefaultHeader(user);
     }
 
     public JwtResponse login(LoginRequest request) {

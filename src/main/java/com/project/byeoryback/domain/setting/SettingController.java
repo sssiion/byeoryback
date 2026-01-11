@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +26,7 @@ public class SettingController {
     private final MenuService menuService;
     private final PageService pageService;
     private final WidgetService widgetService;
+    private final com.project.byeoryback.domain.setting.header.HeaderService headerService;
 
     @GetMapping("/all")
     public ResponseEntity<AllSettingsResponse> getAllSettings(
@@ -34,6 +37,15 @@ public class SettingController {
                 themeService.getTheme(userId),
                 menuService.getMenu(userId),
                 Collections.unmodifiableList(widgetService.getWidgets(userId)),
-                pageService.getPage(userId)));
+                pageService.getPage(userId),
+                com.project.byeoryback.domain.setting.header.HeaderDto.from(headerService.getHeaderSetting(userId))));
+    }
+
+    @PutMapping("/header")
+    public ResponseEntity<Void> updateHeaderSettings(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody com.project.byeoryback.domain.setting.header.HeaderDto dto) {
+        headerService.updateHeaderSetting(userDetails.getUser().getId(), dto.showTimer(), dto.showCredit());
+        return ResponseEntity.ok().build();
     }
 }
