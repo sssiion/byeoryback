@@ -14,28 +14,6 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('property-toggle', '속성 토글', '객체의 속성을 켜거나 끌 수 있는 스위치입니다.', 'Data & Logic', '2x2', '[[2, 2]]', '{}', true, '["switch", "on", "off"]', NOW(), NOW());
 
 -- Diary & Emotion
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('ai-diary', 'AI 감정 분석', '작성된 일기를 바탕으로 감정을 분석해줍니다.', 'Diary & Emotion', '2x1', '[[1, 2], [2, 1], [2, 2]]', '{}', true, '["ai", "emotion", "분석"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('daily-diary', '오늘의 일기', '오늘 하루 있었던 일을 기록하는 기본적인 일기장입니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["diary", "journal", "기록", "글쓰기"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('random-diary', '랜덤 일기', '무작위 주제로 일기를 쓸 수 있게 도와줍니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["random", "topic", "주제"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('exchange-diary', '교환 일기', '친구와 함께 일기를 공유하고 교환할 수 있습니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["share", "friend", "공유"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('past-today', '과거의 오늘', '과거의 오늘 날짜에 썼던 일기를 보여줍니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["past", "history", "추억"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('my-persona', '나의 페르소나', '나의 성격이나 특성을 페르소나 카드로 표현합니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["profile", "character", "성격"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('emotion-analysis', '감정 분석', '감정 상태를 분석하여 시각적인 데이터로 보여줍니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["chart", "graph", "통계"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('compliment-jar', '칭찬 저금통', '스스로에게 해준 칭찬을 모아두는 저금통입니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["praise", "jar", "저금"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('emotional-weather', '마음 날씨', '오늘의 기분을 날씨 아이콘으로 표현합니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["mood", "weather", "기분"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('dream-log', '꿈 기록장', '지난 밤에 꾼 꿈을 기록하고 해몽을 찾아봅니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["dream", "sleep", "잠"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('daily-stamp', '참 잘했어요', '하루 동안 잘한 일에 도장을 찍어 칭찬합니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["stamp", "check", "도장"]', NOW(), NOW());
 
 -- Utility
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -193,21 +171,10 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 -- Widget Size Updates (Applied after initial insert)
 UPDATE widget_definitions SET default_size = '4x1', valid_sizes = '[[1, 1], [4, 1]]', updated_at = NOW() WHERE widget_type = 'welcome';
 
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'my-persona';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'formula-block';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'relation-link';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'rollup';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1]]', updated_at = NOW() WHERE widget_type = 'property-toggle';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 3]]', updated_at = NOW() WHERE widget_type = 'ai-diary';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'daily-diary';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [2, 1]]', updated_at = NOW() WHERE widget_type = 'random-diary';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'exchange-diary';
-UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'past-today';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'emotion-analysis';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2]]', updated_at = NOW() WHERE widget_type = 'compliment-jar';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'emotional-weather';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'dream-log';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'daily-stamp';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[2, 2], [2, 3], [3, 3]]', updated_at = NOW() WHERE widget_type = 'chat-diary';
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [1, 2], [2, 1], [2, 2], [2, 3]]', updated_at = NOW() WHERE widget_type = 'todo-list';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'weather';
