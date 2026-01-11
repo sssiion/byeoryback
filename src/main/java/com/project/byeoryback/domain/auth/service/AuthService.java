@@ -15,6 +15,7 @@ import com.project.byeoryback.domain.auth.dto.PasswordResetVerifyResponseDto;
 import com.project.byeoryback.domain.auth.dto.PasswordResetConfirmRequestDto;
 import com.project.byeoryback.domain.user.exception.UserNotFoundException;
 import com.project.byeoryback.domain.user.repository.UserRepository;
+import com.project.byeoryback.domain.setting.widget.WidgetService;
 import com.project.byeoryback.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
+    private final WidgetService widgetService;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -59,6 +61,9 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        // 기본 위젯 설정 초기화
+        widgetService.initializeDefaultWidgets(user);
     }
 
     public JwtResponse login(LoginRequest request) {
@@ -96,6 +101,9 @@ public class AuthService {
                     .fullProfile(false)
                     .build();
             userRepository.save(user);
+
+            // 기본 위젯 설정 초기화 (신규 소셜 로그인 사용자)
+            widgetService.initializeDefaultWidgets(user);
         } else {
             // Existing user verification
             if (user.getProvider() != request.getProvider()) {

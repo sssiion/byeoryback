@@ -77,7 +77,7 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('recipe-card', '레시피 카드', '좋아하는 요리 레시피를 카드 형태로 보관합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["cook", "food", "kitchen", "요리", "음식"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('fandom-calendar', '덕질 캘린더', '좋아하는 연예인이나 캐릭터의 일정을 관리합니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["idol", "schedule", "fan", "덕질"]', NOW(), NOW());
-INSERT INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
+INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('worry-doll', '걱정 인형', '걱정 인형에게 고민을 털어놓고 마음을 비우세요.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["doll", "listen", "comfort", "위로"]', NOW(), NOW());
 
 -- Decoration & Collection

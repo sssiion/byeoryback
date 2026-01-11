@@ -4,6 +4,7 @@ import com.project.byeoryback.domain.setting.menu.service.MenuService;
 import com.project.byeoryback.domain.setting.page.service.PageService;
 import com.project.byeoryback.domain.setting.theme.service.ThemeService;
 import com.project.byeoryback.global.security.CustomUserDetails;
+import com.project.byeoryback.domain.setting.widget.WidgetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,7 @@ public class SettingController {
     private final ThemeService themeService;
     private final MenuService menuService;
     private final PageService pageService;
-    // private final WidgetService widgetService; // 추후 구현 시 주석 해제
+    private final WidgetService widgetService;
 
     @GetMapping("/all")
     public ResponseEntity<AllSettingsResponse> getAllSettings(
@@ -32,7 +33,7 @@ public class SettingController {
         return ResponseEntity.ok(new AllSettingsResponse(
                 themeService.getTheme(userId),
                 menuService.getMenu(userId),
-                Collections.emptyList(), // widget (아직 구현 안됨)
+                Collections.unmodifiableList(widgetService.getWidgets(userId)),
                 pageService.getPage(userId)));
     }
 }
