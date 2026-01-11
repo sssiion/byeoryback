@@ -33,10 +33,11 @@ public class SettingController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getId();
 
+        java.util.List<java.util.Map<String, Object>> widgets = widgetService.getWidgets(userId);
         return ResponseEntity.ok(new AllSettingsResponse(
                 themeService.getTheme(userId),
                 menuService.getMenu(userId),
-                Collections.unmodifiableList(widgetService.getWidgets(userId)),
+                widgets != null ? Collections.unmodifiableList(widgets) : null,
                 pageService.getPage(userId),
                 com.project.byeoryback.domain.setting.header.HeaderDto.from(headerService.getHeaderSetting(userId))));
     }

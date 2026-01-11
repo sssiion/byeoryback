@@ -1,10 +1,7 @@
 -- System Widgets
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('welcome', '환영 메시지', '사용자에게 환영 인사를 전하는 위젯입니다.', 'System', '2x1', '[[2, 1], [2, 2]]', '{}', true, '["인사", "welcome", "hello"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('theme-guide', '테마 가이드', '현재 적용된 테마의 색상과 스타일 가이드를 보여줍니다.', 'System', '2x2', '[[2, 2]]', '{}', true, '["color", "font", "style", "정보"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
-('feature-card', '기능 카드', '주요 기능을 소개하는 카드형 위젯입니다.', 'System', '2x2', '[[2, 2]]', '{}', true, '[]', NOW(), NOW());
+('welcome', '환영 메시지', '사용자에게 환영 인사를 전하는 위젯입니다.', 'Utility', '2x1', '[[2, 1], [2, 2]]', '{}', true, '["인사", "welcome", "hello"]', NOW(), NOW());
+
 
 -- Data & Logic
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
@@ -205,8 +202,7 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 
 -- Widget Size Updates (Applied after initial insert)
 UPDATE widget_definitions SET default_size = '4x1', valid_sizes = '[[1, 1], [4, 1]]', updated_at = NOW() WHERE widget_type = 'welcome';
-UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 1], [2, 2], [3, 2]]', updated_at = NOW() WHERE widget_type = 'theme-guide';
-UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'feature-card';
+
 UPDATE widget_definitions SET default_size = '2x2', valid_sizes = '[[1, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'my-persona';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[1, 1], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'formula-block';
 UPDATE widget_definitions SET default_size = '2x1', valid_sizes = '[[2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'relation-link';
@@ -296,3 +292,6 @@ UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', up
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', updated_at = NOW() WHERE widget_type = 'physics-box';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'magnifier';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', updated_at = NOW() WHERE widget_type = 'ruby-text';
+
+-- Thumbnail Updates
+UPDATE widget_definitions SET thumbnail = CONCAT('/thumbnails/', widget_type, '.png');

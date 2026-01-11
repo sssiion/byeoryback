@@ -42,6 +42,10 @@ public class WidgetDefinition {
     @Column(nullable = false, length = 50)
     private String category;
 
+    // 썸네일 경로 (예: "/widgets/thumbnails/timeline.png")
+    @Column(length = 255)
+    private String thumbnail;
+
     // 검색용 키워드 태그
     // 예: ["일정", "기록", "history"]
     @Column(columnDefinition = "json")

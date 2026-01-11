@@ -76,7 +76,7 @@ public class WidgetService {
     public List<Map<String, Object>> getWidgets(Long userId) {
         return widgetSettingRepository.findByUser(User.builder().id(userId).build())
                 .map(WidgetSetting::getLayoutData)
-                .orElse(new ArrayList<>());
+                .orElse(null);
     }
 
     @Transactional
