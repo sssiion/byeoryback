@@ -28,4 +28,8 @@ public class HeaderSetting {
     @Column(nullable = false)
     @Builder.Default
     private boolean showCredit = true; // 기본값: 켜짐
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean showWidgetZoom = false; // 위젯 확대 모드 (기본값: 꺼짐)
 }

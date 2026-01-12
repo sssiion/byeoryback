@@ -16,7 +16,8 @@ public class HeaderService {
     @Transactional(readOnly = true)
     public HeaderSetting getHeaderSetting(User user) {
         return headerSettingRepository.findByUser(user)
-                .orElseGet(() -> HeaderSetting.builder().user(user).showTimer(false).showCredit(true).build());
+                .orElseGet(() -> HeaderSetting.builder().user(user).showTimer(false).showCredit(true)
+                        .showWidgetZoom(false).build());
     }
 
     @Transactional(readOnly = true)
@@ -25,13 +26,14 @@ public class HeaderService {
     }
 
     @Transactional
-    public void updateHeaderSetting(Long userId, boolean showTimer, boolean showCredit) {
+    public void updateHeaderSetting(Long userId, boolean showTimer, boolean showCredit, boolean showWidgetZoom) {
         User user = User.builder().id(userId).build();
         HeaderSetting setting = headerSettingRepository.findByUser(user)
                 .orElse(HeaderSetting.builder().user(user).build());
 
         setting.setShowTimer(showTimer);
         setting.setShowCredit(showCredit);
+        setting.setShowWidgetZoom(showWidgetZoom);
 
         headerSettingRepository.save(setting);
     }
@@ -45,6 +47,7 @@ public class HeaderService {
                 .user(user)
                 .showTimer(false)
                 .showCredit(true)
+                .showWidgetZoom(false)
                 .build();
         headerSettingRepository.save(setting);
     }
