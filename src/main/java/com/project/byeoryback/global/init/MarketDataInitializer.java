@@ -32,7 +32,7 @@ public class MarketDataInitializer {
                         List<Map<String, Object>> initialItems = Arrays.asList(
                                         Map.of(
                                                         "referenceId", "pack_basic",
-                                                        "category", "start_pack",
+                                                        "category", "package",
                                                         "name", "⭐ 스타터 팩",
                                                         "description", "다이어리 꾸미기의 기본! 필수 스티커 10종 모음.",
                                                         "price", 500L,
@@ -41,7 +41,7 @@ public class MarketDataInitializer {
                                                         "https://cdn-icons-png.flaticon.com/512/169/169367.png"),
                                         Map.of(
                                                         "referenceId", "sticker_pack_001",
-                                                        "category", "sticker",
+                                                        "category", "package",
                                                         "name", "귀여운 고양이 팩",
                                                         "description", "다이어리에 쓰기 좋은 귀여운 고양이 스티커 모음입니다.",
                                                         "price", 1500L,
@@ -50,7 +50,7 @@ public class MarketDataInitializer {
                                                         "https://cdn-icons-png.flaticon.com/512/616/616408.png"),
                                         Map.of(
                                                         "referenceId", "sticker_pack_002",
-                                                        "category", "sticker",
+                                                        "category", "package",
                                                         "name", "빈티지 라벨",
                                                         "description", "감성적인 다꾸를 위한 빈티지 라벨 스티커입니다.",
                                                         "price", 1200L,
@@ -77,7 +77,7 @@ public class MarketDataInitializer {
                                                         "https://cdn-icons-png.flaticon.com/512/3209/3209265.png"),
                                         Map.of(
                                                         "referenceId", "sticker_pack_003",
-                                                        "category", "sticker",
+                                                        "category", "package",
                                                         "name", "픽셀 아트 이모지",
                                                         "description", "레트로 게임 감성의 픽셀 아트 이모지 팩!",
                                                         "price", 1800L,
@@ -198,8 +198,8 @@ public class MarketDataInitializer {
                                                                                                         "fontStyle",
                                                                                                         "italic"))),
                                                         "floatingImages", List.of(),
-                                                        "thumbnailUrl", data.get("imageUrl"),
-                                                        "imageUrl", data.get("imageUrl")));
+                                                        "tags", data.get("tags"),
+                                                        "thumbnailUrl", data.get("imageUrl")));
                                 } else {
                                         contentJson = objectMapper.writeValueAsString(Map.of(
                                                         "description", data.get("description"),
@@ -215,6 +215,7 @@ public class MarketDataInitializer {
                                                         .name((String) data.get("name"))
                                                         .price((Long) data.get("price"))
                                                         .category((String) data.get("category"))
+                                                        .description((String) data.get("description"))
                                                         .referenceId(referenceId)
                                                         .status(MarketItemStatus.ON_SALE)
                                                         .createdAt(LocalDateTime.now())
@@ -226,6 +227,7 @@ public class MarketDataInitializer {
                                         item.setName((String) data.get("name"));
                                         item.setCategory((String) data.get("category"));
                                         item.setPrice((Long) data.get("price"));
+                                        item.setDescription((String) data.get("description"));
                                         marketItemRepository.save(item);
                                 }
                         }

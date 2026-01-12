@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class MarketItemRequest {
     private String name;
     private Long price;
+    private String description;
     private String category;
     private String contentJson;
     private String referenceId;

@@ -103,6 +103,7 @@ public class MarketService {
                 .name(request.getName())
                 .price(request.getPrice())
                 .category(request.getCategory())
+                .description(request.getDescription())
                 .contentJson(request.getContentJson())
                 .referenceId(request.getReferenceId())
                 .status(MarketItemStatus.ON_SALE)
@@ -129,6 +130,12 @@ public class MarketService {
 
         if (transactionRepository.existsByBuyerIdAndItemId(userId, itemId)) {
             throw new IllegalStateException("이미 구매한 아이템입니다.");
+        }
+
+        if (item.getReferenceId() != null && !item.getReferenceId().isEmpty()) {
+            if (transactionRepository.existsByBuyerIdAndItemReferenceId(userId, item.getReferenceId())) {
+                throw new IllegalStateException("이미 구매한 아이템입니다.");
+            }
         }
 
         long price = item.getPrice();
@@ -176,6 +183,12 @@ public class MarketService {
 
         if (transactionRepository.existsByBuyerIdAndItemId(userId, item.getId())) {
             return; // Already owned
+        }
+
+        if (item.getReferenceId() != null && !item.getReferenceId().isEmpty()) {
+            if (transactionRepository.existsByBuyerIdAndItemReferenceId(userId, item.getReferenceId())) {
+                return; // Already owned
+            }
         }
 
         long price = item.getPrice();
@@ -238,7 +251,8 @@ public class MarketService {
             throw new IllegalStateException("본인의 아이템만 수정할 수 있습니다.");
         }
 
-        item.update(request.getName(), request.getPrice(), request.getContentJson(), request.getCategory());
+        item.update(request.getName(), request.getPrice(), request.getContentJson(), request.getCategory(),
+                request.getDescription());
 
         return MarketItemResponse.from(item, transactionRepository.countByItemId(item.getId()));
     }

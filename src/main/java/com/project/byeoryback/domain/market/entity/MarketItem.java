@@ -35,6 +35,9 @@ public class MarketItem {
     @Column(nullable = false)
     private String category; // e.g. "sticker", "theme"
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Lob
     @Column(columnDefinition = "TEXT")
     private String contentJson; // Stores JSON string of item data (e.g. image url, styles)
@@ -63,7 +66,7 @@ public class MarketItem {
         this.status = MarketItemStatus.CANCELLED;
     }
 
-    public void update(String name, Long price, String contentJson, String category) {
+    public void update(String name, Long price, String contentJson, String category, String description) {
         if (name != null)
             this.name = name;
         if (price != null)
@@ -72,5 +75,7 @@ public class MarketItem {
             this.contentJson = contentJson;
         if (category != null)
             this.category = category;
+        if (description != null)
+            this.description = description;
     }
 }

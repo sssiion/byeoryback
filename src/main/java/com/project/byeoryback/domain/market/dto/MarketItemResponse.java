@@ -18,6 +18,7 @@ public class MarketItemResponse {
     private String sellerName; // Optional, if we want to show who sold it
     private String name;
     private Long price;
+    private String description;
     private String category;
     private String contentJson;
     private String status;
@@ -35,6 +36,7 @@ public class MarketItemResponse {
                                                                                                // for now
                 .name(item.getName())
                 .price(item.getPrice())
+                .description(item.getDescription())
                 .category(item.getCategory())
                 .contentJson(item.getContentJson())
                 .status(item.getStatus().name())

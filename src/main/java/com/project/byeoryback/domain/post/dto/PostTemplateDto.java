@@ -45,6 +45,7 @@ public class PostTemplateDto {
         private List<String> tags;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+        private Long sourceMarketItemId; // Added for resell check
 
         public static Response from(PostTemplate entity) {
             return Response.builder()
@@ -60,6 +61,7 @@ public class PostTemplateDto {
                     .tags(entity.getTags())
                     .createdAt(entity.getCreatedAt())
                     .updatedAt(entity.getUpdatedAt())
+                    .sourceMarketItemId(entity.getSourceMarketItemId())
                     .build();
         }
     }
