@@ -33,26 +33,25 @@ public class PersonaController {
 
     @PutMapping("/settings")
     public ResponseEntity<?> updateSettings(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestBody PersonaSettingsRequest request) {
+            @RequestBody PersonaSettingsRequest request) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         personaService.updateSettings(user.getId(), request);
         return ResponseEntity.ok("Persona settings updated");
     }
 
     @PostMapping("/analyze")
     public ResponseEntity<?> analyzePersona(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestParam(required = false) Integer year, // 파라미터가 올 수도, 안 올 수도 있음
-                                            @RequestParam(required = false) Integer month
-    ) {
+            @RequestParam(required = false) Integer year, // 파라미터가 올 수도, 안 올 수도 있음
+            @RequestParam(required = false) Integer month) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if(year !=null && month !=null){
-            personaService.analyzePersona(user.getId(),year,month);
+        if (year != null && month != null) {
+            personaService.analyzePersona(user.getId(), year, month);
 
-        }else{
+        } else {
             personaService.analyzePersona(user.getId());
 
         }
@@ -69,6 +68,6 @@ public class PersonaController {
                         .analysisResult(persona.getAnalysisResult())
                         .emotionKeywords(persona.getEmotionKeywords())
                         .build()))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.ok(java.util.Collections.emptyList()));
     }
 }

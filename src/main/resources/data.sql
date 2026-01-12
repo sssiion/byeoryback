@@ -101,9 +101,12 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('lp-player', '턴테이블', 'LP판을 올려 음악을 재생하는 턴테이블입니다.', 'Interactive', '2x2', '[[2, 2]]', '{}', true, '["music", "record", "play", "음악", "노래"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('bonfire', '모닥불', '타닥타닥 타오르는 모닥불을 보며 불멍을 즐기세요.', 'Interactive', '2x2', '[[2, 2]]', '{}', true, '["fire", "camp", "relax", "불"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
+INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES
 ('chat-diary', '나와의 채팅', '메신저 형식으로 나 자신과 대화를 나눕니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["talk", "message", "chat", "대화"]', NOW(), NOW());
-INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
+INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES
+('mood-analytics', 'Mood Analytics', '나의 감정 분포를 차트로 확인합니다.', 'Diary & Emotion', '2x1', '[[1, 1], [2, 1]]', '{}', true, '["mood", "chart", "analysis", "감정"]', NOW(), NOW()),
+('word-mind-map', 'Word Mind Map', '나의 기록에서 자주 등장하는 키워드를 확인합니다.', 'Diary & Emotion', '2x1', '[[1, 1], [2, 1]]', '{}', true, '["word", "cloud", "analysis", "keyword"]', NOW(), NOW());
+INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES
 ('tag-cloud', '태그 구름', '자주 사용하는 태그들을 구름 모양으로 보여줍니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["keyword", "cloud", "text", "단어"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
 ('scratch-card', '복권 긁기', '은박을 긁어서 당첨 결과를 확인하는 재미를 느껴보세요.', 'Interactive', '2x2', '[[2, 2]]', '{}', true, '["lottery", "luck", "scrtach", "복권"]', NOW(), NOW());
