@@ -1,6 +1,5 @@
 package com.project.byeoryback.domain.room.entity;
 
-import com.project.byeoryback.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;

@@ -85,14 +85,10 @@ public class SettingController {
     @org.springframework.web.bind.annotation.PostMapping("/widgets/presets")
     public ResponseEntity<Void> createPreset(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody java.util.Map<String, Object> request) {
+            @RequestBody com.project.byeoryback.domain.setting.widget.dto.WidgetPresetRequest request) {
 
-        String name = (String) request.get("name");
-        java.util.List<java.util.Map<String, Object>> widgets = (java.util.List<java.util.Map<String, Object>>) request
-                .get("widgets");
-        java.util.Map<String, Integer> gridSize = (java.util.Map<String, Integer>) request.get("gridSize");
-
-        widgetService.createPreset(userDetails.getUser().getId(), name, widgets, gridSize);
+        widgetService.createPreset(userDetails.getUser().getId(), request.getName(), request.getWidgets(),
+                request.getGridSize());
         return ResponseEntity.ok().build();
     }
 
@@ -108,13 +104,9 @@ public class SettingController {
     public ResponseEntity<Void> updatePreset(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @org.springframework.web.bind.annotation.PathVariable Long id,
-            @RequestBody java.util.Map<String, Object> request) {
+            @RequestBody com.project.byeoryback.domain.setting.widget.dto.WidgetPresetRequest request) {
 
-        java.util.List<java.util.Map<String, Object>> widgets = (java.util.List<java.util.Map<String, Object>>) request
-                .get("widgets");
-        java.util.Map<String, Integer> gridSize = (java.util.Map<String, Integer>) request.get("gridSize");
-
-        widgetService.updatePreset(userDetails.getUser().getId(), id, widgets, gridSize);
+        widgetService.updatePreset(userDetails.getUser().getId(), id, request.getWidgets(), request.getGridSize());
         return ResponseEntity.ok().build();
     }
 }

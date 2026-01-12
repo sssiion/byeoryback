@@ -10,16 +10,12 @@ import com.project.byeoryback.domain.user.exception.UserProfileNotFoundException
 
 import com.project.byeoryback.domain.user.exception.NicknameAlreadyExistsException;
 import com.project.byeoryback.domain.post.repository.PostRepository;
-import com.project.byeoryback.domain.todo.repository.TodoRepository;
 import com.project.byeoryback.domain.setting.page.repository.PageSettingRepository;
 import com.project.byeoryback.domain.setting.theme.repository.ThemeSettingRepository;
 import com.project.byeoryback.domain.setting.menu.repository.MenuSettingRepository;
 import com.project.byeoryback.domain.album.repository.AlbumRepository;
 import com.project.byeoryback.domain.room.repository.RoomRepository;
 import com.project.byeoryback.domain.room.repository.RoomMemberRepository;
-import com.project.byeoryback.domain.market.repository.MarketTransactionRepository;
-import com.project.byeoryback.domain.market.repository.WishlistRepository;
-import com.project.byeoryback.domain.market.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +33,7 @@ public class UserService {
         private final PostRepository postRepository;
         private final PostTemplateRepository postTemplateRepository; // Added for deletion
         private final com.project.byeoryback.domain.post.repository.PostStatRepository postStatRepository; // Added
-        private final TodoRepository todoRepository;
+
         private final PageSettingRepository pageSettingRepository;
         private final ThemeSettingRepository themeSettingRepository;
         private final MenuSettingRepository menuSettingRepository;

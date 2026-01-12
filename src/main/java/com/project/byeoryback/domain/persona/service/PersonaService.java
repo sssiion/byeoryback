@@ -20,7 +20,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 import com.project.byeoryback.domain.persona.dto.PersonaSettingsRequest;
-import com.project.byeoryback.domain.hashtag.entity.PostHashtag;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -91,9 +91,10 @@ public class PersonaService {
 
     /**
      * 페르소나 분석 (전체 또는 월별)
+     * 
      * @param userId 사용자 ID
-     * @param year 분석할 연도 (null이면 전체)
-     * @param month 분석할 월 (null이면 전체)
+     * @param year   분석할 연도 (null이면 전체)
+     * @param month  분석할 월 (null이면 전체)
      */
     @Transactional
     public void analyzePersona(Long userId, Integer year, Integer month) {
@@ -118,7 +119,8 @@ public class PersonaService {
             LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
             // [New] Repository 메서드 사용
-            posts = postRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startDateTime, endDateTime);
+            posts = postRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startDateTime,
+                    endDateTime);
         } else {
             // 전체 조회
             posts = postRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
@@ -136,24 +138,27 @@ public class PersonaService {
                 boolean shouldExclude = post.getPostHashtags().stream()
                         .map(ph -> ph.getHashtag().getName()) // Hashtag 엔티티의 이름 필드 가정
                         .anyMatch(tagName -> excludedTags.contains(tagName));
-                
+
                 if (shouldExclude) {
                     continue;
                 }
             }
 
-            if (post.getTitle() != null) sb.append("Title: ").append(post.getTitle()).append("\n");
+            if (post.getTitle() != null)
+                sb.append("Title: ").append(post.getTitle()).append("\n");
 
             // 텍스트 블록
             if (post.getBlocks() != null) {
                 post.getBlocks().forEach(block -> {
-                    if (block.getText() != null) sb.append(block.getText()).append(" ");
+                    if (block.getText() != null)
+                        sb.append(block.getText()).append(" ");
                 });
             }
             // 플로팅 텍스트
             if (post.getFloatingTexts() != null) {
                 post.getFloatingTexts().forEach(item -> {
-                    if (item.getText() != null) sb.append(item.getText()).append(" ");
+                    if (item.getText() != null)
+                        sb.append(item.getText()).append(" ");
                 });
             }
             sb.append("\n---\n");
@@ -176,7 +181,8 @@ public class PersonaService {
                 "\n" +
                 "JSON Schema & Example (Values must be in Korean):\n" +
                 "{{\n" +
-                "  \"representativeEmoji\": \"🐱\", (Select ONE emoji that best represents the user's overall vibe. e.g. 🐱, 🌿, ☕, 📚, 🎸)\n" +
+                "  \"representativeEmoji\": \"🐱\", (Select ONE emoji that best represents the user's overall vibe. e.g. 🐱, 🌿, ☕, 📚, 🎸)\n"
+                +
                 "\n" +
                 "  \"digitalSelf\": [\n" +
                 "    \"당신은 일상의 작은 순간들 속에서 평화를 찾습니다\", \n" +
@@ -184,7 +190,8 @@ public class PersonaService {
                 "    \"자연 속에서 사색하며 에너지를 얻는 편입니다\"\n" +
                 "  ], (3 sentences describing the user's persona in Korean styled like 'You tend to...')\n" +
                 "\n" +
-                "  \"characteristics\": [\"호기심 많은\", \"자연을 사랑하는\", \"사색적인\", \"감사하는\", \"창의적인\"], (5 key adjectives in Korean)\n" +
+                "  \"characteristics\": [\"호기심 많은\", \"자연을 사랑하는\", \"사색적인\", \"감사하는\", \"창의적인\"], (5 key adjectives in Korean)\n"
+                +
                 "\n" +
                 "  \"moods\": [\n" +
                 "    {\"mood\": \"평온함\", \"percentage\": 45, \"emoji\": \"😌\"},\n" +
@@ -240,7 +247,7 @@ public class PersonaService {
                                 .id(p.getId()) // 기존 ID 유지
                                 .user(user)
                                 .analysisResult(finalJsonResult) // JSON 통째로 저장
-                                .emotionKeywords(finalKeywords)  // 검색용 키워드 저장
+                                .emotionKeywords(finalKeywords) // 검색용 키워드 저장
                                 .excludedHashtags(p.getExcludedHashtags()) // [중요] 기존 제외 태그 설정 유지
                                 .createdAt(LocalDateTime.now())
                                 .build())
