@@ -32,4 +32,8 @@ public class HeaderSetting {
     @Column(nullable = false)
     @Builder.Default
     private boolean showWidgetZoom = false; // 위젯 확대 모드 (기본값: 꺼짐)
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean showFloatingPanel = true; // 설정 플로팅바 표시 여부 (기본값: 켜짐)
 }

@@ -47,7 +47,7 @@ public class SettingController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody com.project.byeoryback.domain.setting.header.HeaderDto dto) {
         headerService.updateHeaderSetting(userDetails.getUser().getId(), dto.showTimer(), dto.showCredit(),
-                dto.showWidgetZoom());
+                dto.showWidgetZoom(), dto.showFloatingPanel());
         return ResponseEntity.ok().build();
     }
 

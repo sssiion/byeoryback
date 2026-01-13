@@ -16,8 +16,12 @@ public class HeaderService {
     @Transactional(readOnly = true)
     public HeaderSetting getHeaderSetting(User user) {
         return headerSettingRepository.findByUser(user)
-                .orElseGet(() -> HeaderSetting.builder().user(user).showTimer(false).showCredit(true)
-                        .showWidgetZoom(false).build());
+                .orElseGet(() -> HeaderSetting.builder().user(user)
+                        .showTimer(false)
+                        .showCredit(true)
+                        .showWidgetZoom(false)
+                        .showFloatingPanel(true)
+                        .build());
     }
 
     @Transactional(readOnly = true)
@@ -26,7 +30,8 @@ public class HeaderService {
     }
 
     @Transactional
-    public void updateHeaderSetting(Long userId, boolean showTimer, boolean showCredit, boolean showWidgetZoom) {
+    public void updateHeaderSetting(Long userId, boolean showTimer, boolean showCredit, boolean showWidgetZoom,
+            boolean showFloatingPanel) {
         User user = User.builder().id(userId).build();
         HeaderSetting setting = headerSettingRepository.findByUser(user)
                 .orElse(HeaderSetting.builder().user(user).build());
@@ -34,6 +39,7 @@ public class HeaderService {
         setting.setShowTimer(showTimer);
         setting.setShowCredit(showCredit);
         setting.setShowWidgetZoom(showWidgetZoom);
+        setting.setShowFloatingPanel(showFloatingPanel);
 
         headerSettingRepository.save(setting);
     }
@@ -48,6 +54,7 @@ public class HeaderService {
                 .showTimer(false)
                 .showCredit(true)
                 .showWidgetZoom(false)
+                .showFloatingPanel(true)
                 .build();
         headerSettingRepository.save(setting);
     }
