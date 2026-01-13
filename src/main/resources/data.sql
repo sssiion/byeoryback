@@ -105,7 +105,8 @@ INSERT IGNORE INTO widget_definitions (widget_type, label, description, category
 ('chat-diary', '나와의 채팅', '메신저 형식으로 나 자신과 대화를 나눕니다.', 'Diary & Emotion', '2x2', '[[2, 2]]', '{}', true, '["talk", "message", "chat", "대화"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES
 ('mood-analytics', 'Mood Analytics', '나의 감정 분포를 차트로 확인합니다.', 'Diary & Emotion', '2x1', '[[1, 1], [2, 1]]', '{}', true, '["mood", "chart", "analysis", "감정"]', NOW(), NOW()),
-('word-mind-map', 'Word Mind Map', '나의 기록에서 자주 등장하는 키워드를 확인합니다.', 'Diary & Emotion', '2x1', '[[1, 1], [2, 1]]', '{}', true, '["word", "cloud", "analysis", "keyword"]', NOW(), NOW());
+('word-mind-map', 'Word Mind Map', '나의 기록에서 자주 등장하는 키워드를 확인합니다.', 'Diary & Emotion', '2x1', '[[1, 1], [2, 1]]', '{}', true, '["word", "cloud", "analysis", "keyword"]', NOW(), NOW()),
+('random-diary', '랜덤일기', '작성한 일기 중 하나를 무작위로 뽑아 추억을 회상합니다.', 'Diary & Emotion', '1x1', '[[1, 1], [2, 2]]', '{}', true, '["random", "diary", "일기", "뽑기", "추억"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES
 ('tag-cloud', '태그 구름', '자주 사용하는 태그들을 구름 모양으로 보여줍니다.', 'Utility', '2x2', '[[2, 2]]', '{}', true, '["keyword", "cloud", "text", "단어"]', NOW(), NOW());
 INSERT IGNORE INTO widget_definitions (widget_type, label, description, category, default_size, valid_sizes, default_props, is_system, keywords, created_at, updated_at) VALUES 
