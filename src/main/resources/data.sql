@@ -184,6 +184,6 @@ UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', up
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', updated_at = NOW() WHERE widget_type = 'physics-box';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1], [1, 2], [2, 1], [2, 2]]', updated_at = NOW() WHERE widget_type = 'magnifier';
 UPDATE widget_definitions SET default_size = '1x1', valid_sizes = '[[1, 1]]', updated_at = NOW() WHERE widget_type = 'ruby-text';
-
--- Thumbnail Updates
-UPDATE widget_definitions SET thumbnail = CONCAT('/thumbnails/', widget_type, '.png');
+UPDATE widget_definitions SET thumbnail = '/thumbnails/emotion-analysis.png' WHERE widget_type = 'mood-analytics';
+UPDATE widget_definitions SET thumbnail = '/thumbnails/tag-cloud.png' WHERE widget_type = 'word-mind-map';
+UPDATE widget_definitions SET thumbnail = CONCAT('/thumbnails/', widget_type, '.png') WHERE thumbnail IS NULL;
