@@ -31,6 +31,7 @@ public class CustomWidgetService {
                 .defaultSize(request.getDefaultSize() != null ? request.getDefaultSize() : "2x2") // 🌟 없으면 2x2 기본값
                 .content(request.getContent())
                 .styles(request.getStyles())
+                .decorations(request.getDecorations()) // 🌟 [NEW] 꾸미기 요소 저장
                 .isShared(false) // 기본은 비공개
                 .build();
 
@@ -65,6 +66,7 @@ public class CustomWidgetService {
                 request.getDefaultSize(),
                 request.getContent(),
                 request.getStyles(),
+                request.getDecorations(), // 🌟 [NEW] 꾸미기 요소 수정
                 request.isShared() // DTO에 없다면 false or 기존값 유지
         );
         return customWidget;
@@ -94,6 +96,7 @@ public class CustomWidgetService {
                 customWidget.getDefaultSize(),
                 customWidget.getContent(),
                 customWidget.getStyles(),
+                customWidget.getDecorations(), // 🌟 [NEW] 꾸미기 요소 유지
                 !customWidget.isShared() // true <-> false 토글
         );
 
@@ -121,9 +124,10 @@ public class CustomWidgetService {
                 .name(originalCustomWidget.getName())
                 .type(originalCustomWidget.getType())
                 .content(originalCustomWidget.getContent()) // 데이터 복사
-                .styles(originalCustomWidget.getStyles())   // 스타일 복사
-                .user(me)                             // 소유자 변경
-                .isShared(false)                      // 가져온 건 비공개 시작
+                .styles(originalCustomWidget.getStyles()) // 스타일 복사
+                .decorations(originalCustomWidget.getDecorations()) // 🌟 [NEW] 꾸미기 요소 복사
+                .user(me) // 소유자 변경
+                .isShared(false) // 가져온 건 비공개 시작
                 .build();
 
         return customWidgetRepository.save(myCopy);

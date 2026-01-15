@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -60,17 +61,24 @@ public class CustomWidget {
     @Column(length = 10)
     private String defaultSize;
 
+    // 👇 [추가] 도형/꾸미기 요소 저장용 필드
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Map<String, Object>> decorations; // Decorations List
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String name,String defaultSize, Map<String, Object> content, Map<String, Object> styles, boolean isShared) {
+    public void update(String name, String defaultSize, Map<String, Object> content, Map<String, Object> styles,
+            List<Map<String, Object>> decorations, boolean isShared) {
         this.name = name;
         this.defaultSize = defaultSize; // 사이즈 업데이트
         this.content = content;
         this.styles = styles;
+        this.decorations = decorations;
         this.isShared = isShared;
         this.updatedAt = LocalDateTime.now(); // 수정 시간 갱신
     }
