@@ -28,8 +28,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/payment/**").authenticated()
                         .requestMatchers("/api/templates/**").authenticated() // Explicitly allow templates
                         .requestMatchers("/api/persona/**").authenticated() // Persona endpoints
                         .anyRequest().authenticated())
