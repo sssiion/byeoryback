@@ -25,4 +25,5 @@ public class PostRequest {
     private Boolean isFavorite;
     private Boolean isPublic;
 
+    private Long roomId; // [Added] For Group Activity
 }

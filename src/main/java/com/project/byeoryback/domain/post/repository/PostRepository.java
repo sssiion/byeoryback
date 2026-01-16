@@ -15,6 +15,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         // 특정 유저의 글 목록 조회 (최신순)
         List<Post> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
+        // ✨ [New] 개인 기록만 조회 (그룹 활동 제외)
+        List<Post> findAllByUserIdAndRoomIsNullOrderByCreatedAtDesc(Long userId);
+
         // 유저의 게시글 수 카운트
         long countByUserId(Long userId);
 

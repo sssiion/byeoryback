@@ -31,15 +31,19 @@ public class PostService {
     private final AlbumRepository albumRepository;
     // [추가됨] 커뮤니티 서비스 주입
     private final com.project.byeoryback.domain.community.service.CommunityService communityService;
+    // [추가됨] 룸 리포지토리 주입
+    private final com.project.byeoryback.domain.room.repository.RoomRepository roomRepository;
 
     // 1. 전체 조회 (최신순)
     public List<Post> getAllPosts() {
         return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    // [New] 특정 유저의 게시글만 조회
+    // [New] 특정 유저의 게시글만 조회 (그룹 활동 제외, 순수 개인 기록만)
     public List<Post> getPostsByUserId(Long userId) {
-        return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+        // 기존: findAllByUserIdOrderByCreatedAtDesc(userId) -> 그룹 활동 포함됨
+        // 수정: findAllByUserIdAndRoomIsNullOrderByCreatedAtDesc(userId) -> 개인 기록만
+        return postRepository.findAllByUserIdAndRoomIsNullOrderByCreatedAtDesc(userId);
     }
 
     // 2. 게시글 생성
@@ -58,6 +62,13 @@ public class PostService {
                 .isPublic(request.getIsPublic() != null ? request.getIsPublic() : true)
                 .styles(request.getStyles())
                 .build();
+
+        // [Added] Room Association
+        if (request.getRoomId() != null) {
+            com.project.byeoryback.domain.room.entity.Room room = roomRepository.findById(request.getRoomId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 방이 없습니다. id=" + request.getRoomId()));
+            post.setRoom(room); // Post 엔티티에 setRoom 메서드(Setter)가 있어야 함 (Lombok @Data/@Setter 확인 필요)
+        }
 
         Post savedPost = postRepository.save(post);
 

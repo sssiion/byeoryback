@@ -21,6 +21,7 @@ import java.util.ArrayList;
         @Index(name = "idx_posts_public_created", columnList = "is_public, created_at DESC")
 })
 @Getter
+@Setter // [Added] For setRoom and others
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

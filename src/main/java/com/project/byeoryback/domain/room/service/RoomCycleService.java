@@ -173,6 +173,10 @@ public class RoomCycleService {
             throw new IllegalArgumentException("It is not your turn");
         }
 
+        // [Fix] Enforce Room Scope and Private Visibility
+        request.setRoomId(cycle.getRoom().getId());
+        request.setIsPublic(false);
+
         com.project.byeoryback.domain.post.entity.Post post;
         if (cycle.getPostId() == null) {
             post = postService.createPost(requester, request);
