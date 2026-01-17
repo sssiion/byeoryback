@@ -19,8 +19,9 @@ public class PostTemplateController {
 
     @GetMapping("/my")
     public ResponseEntity<List<PostTemplateDto.Response>> getMyTemplates(
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(postTemplateService.getMyTemplates(userDetails.getUser().getId()));
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) Boolean showHidden) {
+        return ResponseEntity.ok(postTemplateService.getMyTemplates(userDetails.getUser().getId(), showHidden));
     }
 
     @PostMapping
@@ -40,6 +41,14 @@ public class PostTemplateController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
         postTemplateService.deleteTemplate(userDetails.getUser().getId(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<Void> restoreTemplate(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id) {
+        postTemplateService.restoreTemplate(userDetails.getUser().getId(), id);
         return ResponseEntity.ok().build();
     }
 }

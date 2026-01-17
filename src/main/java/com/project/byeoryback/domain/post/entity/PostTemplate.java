@@ -69,6 +69,10 @@ public class PostTemplate {
     @Column
     private Long sourceMarketItemId;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isHidden = false;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;

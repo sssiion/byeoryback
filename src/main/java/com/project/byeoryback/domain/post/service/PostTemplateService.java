@@ -24,11 +24,12 @@ public class PostTemplateService {
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Transactional
-    public List<PostTemplateDto.Response> getMyTemplates(Long userId) {
+    public List<PostTemplateDto.Response> getMyTemplates(Long userId, Boolean showHidden) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<PostTemplate> templates = postTemplateRepository.findAllByUserOrderByCreatedAtDesc(user);
+        System.out.println("DEBUG: Fetch all templates count: " + templates.size() + ", showHidden: " + showHidden);
 
         // ✨ 1. Sync Missing Purchases (Retroactive Fix)
         try {
@@ -40,9 +41,40 @@ public class PostTemplateService {
                 com.project.byeoryback.domain.market.entity.MarketItem item = tx.getItem();
                 if ("template_post".equalsIgnoreCase(item.getCategory())
                         || "TEMPLATE".equalsIgnoreCase(item.getCategory())) {
-                    boolean exists = templates.stream().anyMatch(
-                            t -> t.getSourceMarketItemId() != null && t.getSourceMarketItemId().equals(item.getId()));
-                    if (!exists) {
+
+                    // Check for Exact ID Match
+                    PostTemplate existing = templates.stream()
+                            .filter(t -> t.getSourceMarketItemId() != null
+                                    && t.getSourceMarketItemId().equals(item.getId()))
+                            .findFirst().orElse(null);
+
+                    // Check for Name Match (Legacy backfill)
+                    if (existing == null) {
+                        existing = templates.stream()
+                                .filter(t -> t.getSourceMarketItemId() == null
+                                        && t.getName().equals(item.getName())
+                                        && t.getTags() != null && t.getTags().contains("acquired"))
+                                .findFirst().orElse(null);
+
+                        if (existing != null) {
+                            // Backfill ID
+                            existing.setSourceMarketItemId(item.getId());
+                            // Also refresh content to ensure it's up to date
+                            if (item.getContentJson() != null) {
+                                try {
+                                    PostTemplateDto.CreateRequest freshData = objectMapper
+                                            .readValue(item.getContentJson(), PostTemplateDto.CreateRequest.class);
+                                    existing.update(freshData.getName(), freshData.getStyles(), freshData.getStickers(),
+                                            existing.getFloatingTexts(), existing.getFloatingImages(),
+                                            freshData.getDefaultFontColor(), freshData.getThumbnailUrl());
+                                } catch (Exception e) {
+                                }
+                            }
+                            postTemplateRepository.save(existing);
+                        }
+                    }
+
+                    if (existing == null) {
                         // Create missing template
                         if (item.getContentJson() != null) {
                             try {
@@ -139,15 +171,25 @@ public class PostTemplateService {
                             postTemplateRepository.save(template);
                         }
                     } catch (Exception e) {
-                        System.err.println("Failed to heal template: " + e.getMessage());
+
                     }
                 }
             }
         }
 
-        return templates.stream()
+        List<PostTemplateDto.Response> result = templates.stream()
+                .filter(t -> {
+                    boolean isHidden = t.getIsHidden() != null && t.getIsHidden();
+                    if (Boolean.TRUE.equals(showHidden)) {
+                        return isHidden; // Show ONLY hidden items
+                    } else {
+                        return !isHidden; // Show ONLY active items
+                    }
+                })
                 .map(PostTemplateDto.Response::from)
                 .collect(Collectors.toList());
+
+        return result;
     }
 
     @Transactional
@@ -178,7 +220,32 @@ public class PostTemplateService {
             throw new IllegalArgumentException("Not authorized to delete this template");
         }
 
-        postTemplateRepository.delete(template);
+        boolean isPurchased = template.getSourceMarketItemId() != null
+                || (template.getTags() != null && template.getTags().contains("acquired"));
+
+        if (isPurchased) {
+            // ✨ Soft Delete for Purchased Templates
+
+            template.setIsHidden(true);
+            postTemplateRepository.save(template);
+        } else {
+            // Hard Delete for Custom Templates
+
+            postTemplateRepository.delete(template);
+        }
+    }
+
+    @Transactional
+    public void restoreTemplate(Long userId, Long templateId) {
+        PostTemplate template = postTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+
+        if (!template.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Not authorized to restore this template");
+        }
+
+        template.setIsHidden(false);
+        postTemplateRepository.save(template);
     }
 
     public PostTemplateDto.Response getTemplate(Long templateId) {
