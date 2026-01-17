@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.project.byeoryback.global.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/widgets")
@@ -26,9 +28,9 @@ public class CustomWidgetController {
      */
     @PostMapping
     public ResponseEntity<CustomWidget> createWidget(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CustomWidgetRequest request) {
-        return ResponseEntity.ok(customWidgetService.createWidget(userId, request));
+        return ResponseEntity.ok(customWidgetService.createWidget(userDetails.getUser().getId(), request));
     }
 
     /**
@@ -38,9 +40,9 @@ public class CustomWidgetController {
      */
     @GetMapping("/my")
     public ResponseEntity<Page<CustomWidget>> getMyWidgets(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(customWidgetService.getMyWidgets(userId, pageable));
+        return ResponseEntity.ok(customWidgetService.getMyWidgets(userDetails.getUser().getId(), pageable));
     }
 
     /**
@@ -70,10 +72,9 @@ public class CustomWidgetController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<CustomWidget> updateWidget(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id,
             @RequestBody CustomWidgetRequest request) {
-        // 실무에선 Service 안에서 userId와 widget 작성자가 같은지 체크해야 함
         return ResponseEntity.ok(customWidgetService.updateWidget(id, request));
     }
 
@@ -83,9 +84,8 @@ public class CustomWidgetController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWidget(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
-        // 실무에선 Service 안에서 userId와 widget 작성자가 같은지 체크해야 함
         customWidgetService.deleteWidget(id);
         return ResponseEntity.ok().build();
     }
@@ -97,9 +97,9 @@ public class CustomWidgetController {
      */
     @PatchMapping("/{id}/share")
     public ResponseEntity<CustomWidget> toggleShare(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
-        return ResponseEntity.ok(customWidgetService.toggleShare(userId, id));
+        return ResponseEntity.ok(customWidgetService.toggleShare(userDetails.getUser().getId(), id));
     }
 
     /**
@@ -109,8 +109,8 @@ public class CustomWidgetController {
      */
     @PostMapping("/{id}/fork")
     public ResponseEntity<CustomWidget> forkWidget(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable("id") Long originalWidgetId) {
-        return ResponseEntity.ok(customWidgetService.forkWidget(userId, originalWidgetId));
+        return ResponseEntity.ok(customWidgetService.forkWidget(userDetails.getUser().getId(), originalWidgetId));
     }
 }
