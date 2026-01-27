@@ -53,7 +53,7 @@ dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // 7. docker
-    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     // 8. Google SMTP
     implementation 'org.springframework.boot:spring-boot-starter-mail'
